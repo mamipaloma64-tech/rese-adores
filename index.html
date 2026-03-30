@@ -3,267 +3,235 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ReviewPositive | VZ Premium v2</title>
+    <title>ReviewPositive | Sistema VZ Elite</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Inter:wght@300;400;700&display=swap');
-        :root { --neon: #bc13fe; --gold: #ffcc00; --red: #ff4444; --green: #00ff88; --dark-bg: #050508; }
+        :root { --neon: #bc13fe; --gold: #ffcc00; --red: #ff4444; --green: #00ff88; }
+        body { background: #030305; color: #e2e8f0; font-family: 'Inter', sans-serif; min-height: 100vh; margin: 0; overflow-x: hidden; }
+        .neon-text { color: var(--neon); text-shadow: 0 0 15px rgba(188, 19, 254, 0.6); font-family: 'Orbitron', sans-serif; }
+        .glass { background: rgba(10, 10, 15, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(188, 19, 254, 0.2); border-radius: 15px; }
         
-        body { background: var(--dark-bg); color: #e2e8f0; font-family: 'Inter', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
-        .neon-text { color: var(--neon); text-shadow: 0 0 12px rgba(188, 19, 254, 0.5); font-family: 'Orbitron', sans-serif; }
-        .glass { background: rgba(15, 15, 25, 0.8); backdrop-filter: blur(15px); border: 1px solid rgba(188, 19, 254, 0.15); border-radius: 20px; }
-        
-        /* Botones y Inputs */
-        .btn-p { background: linear-gradient(135deg, #bc13fe 0%, #6a0dad 100%); padding: 12px; border-radius: 12px; font-weight: 900; font-family: 'Orbitron'; font-size: 0.75rem; color: white; border: none; cursor: pointer; transition: 0.3s; width: 100%; text-transform: uppercase; }
-        .btn-p:active { transform: scale(0.96); }
-        .input-q { background: rgba(0,0,0,0.6); border: 1px solid rgba(188,19,254,0.2); color: white; padding: 12px; border-radius: 12px; width: 100%; outline: none; font-size: 0.9rem; }
-        
-        /* Layout Mobile Fix */
-        .sidebar { width: 260px; height: 100vh; position: fixed; left: 0; top: 0; background: #000; border-right: 1px solid #1a1a1a; z-index: 1000; }
-        .main-content { margin-left: 260px; padding: 40px; padding-bottom: 120px; }
-        .mobile-nav { display: none; position: fixed; bottom: 0; width: 100%; background: rgba(0,0,0,0.9); height: 75px; z-index: 9999; border-top: 1px solid var(--neon); display: none; }
+        .input-q { background: rgba(0,0,0,0.7); border: 1px solid rgba(188,19,254,0.2); color: white; padding: 0.8rem; border-radius: 12px; width: 100%; font-size: 0.85rem; outline: none; }
+        .btn-p { background: linear-gradient(135deg, #bc13fe 0%, #6a0dad 100%); padding: 0.9rem; border-radius: 12px; font-weight: 900; font-family: 'Orbitron'; font-size: 0.7rem; color: white; width: 100%; border: none; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
 
-        @media (max-width: 768px) {
-            .sidebar { display: none !important; } /* Ocultar sidebar PC en movil */
-            .main-content { margin-left: 0; padding: 20px; padding-bottom: 110px; }
-            .mobile-nav { display: grid; grid-template-columns: repeat(5, 1fr); align-items: center; text-align: center; }
+        /* Layout Fixes */
+        .sidebar { width: 260px; height: 100vh; position: fixed; left: 0; top: 0; background: #000; border-right: 1px solid #1a1a1a; z-index: 100; }
+        .mobile-nav { display: none; position: fixed; bottom: 0; width: 100%; background: #000; height: 75px; z-index: 1000; border-top: 2px solid var(--neon); }
+        .main { margin-left: 260px; padding: 30px; padding-bottom: 120px; }
+        
+        @media (max-width: 768px) { 
+            .sidebar { display: none !important; } 
+            .mobile-nav { display: grid; grid-template-columns: repeat(5, 1fr); align-items: center; } 
+            .main { margin-left: 0; padding: 15px; padding-bottom: 110px; } 
         }
 
-        /* Historial Pestañas */
-        .tab-btn { padding: 10px; font-size: 10px; font-weight: 900; color: #555; border-bottom: 2px solid transparent; cursor: pointer; }
-        .tab-btn.active { color: var(--neon); border-bottom-color: var(--neon); }
-
-        /* Vistas */
-        .view { display: none; }
-        .view.active { display: block; animation: slideUp 0.4s ease; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Badge Estados */
-        .badge { padding: 4px 10px; border-radius: 8px; font-size: 9px; font-weight: 800; text-transform: uppercase; }
-        .badge-pend { background: rgba(255, 204, 0, 0.15); color: var(--gold); }
-        .badge-ok { background: rgba(0, 255, 136, 0.15); color: var(--green); }
-        .badge-fail { background: rgba(255, 68, 68, 0.15); color: var(--red); }
+        .view { display: none; } .view.active { display: block; }
+        
+        /* Pestañas Historial */
+        .tab-hist { padding: 12px; font-size: 10px; font-weight: 900; text-align: center; color: #555; cursor: pointer; border-bottom: 2px solid transparent; transition: 0.3s; }
+        .tab-hist.active { color: var(--neon); border-bottom-color: var(--neon); background: rgba(188, 19, 254, 0.05); }
+        
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 8px; font-weight: bold; text-transform: uppercase; }
+        .bg-pend { background: rgba(255, 204, 0, 0.1); color: var(--gold); border: 1px solid var(--gold); }
+        .bg-ok { background: rgba(0, 255, 136, 0.1); color: var(--green); border: 1px solid var(--green); }
+        .bg-fail { background: rgba(255, 68, 68, 0.1); color: var(--red); border: 1px solid var(--red); }
     </style>
 </head>
 <body>
 
-<div id="auth-error-msg" class="fixed top-10 left-0 w-full flex justify-center z-[10000] hidden">
-    <div class="bg-red-600 text-white px-6 py-2 rounded-full font-black text-xs shadow-2xl">CORREO O CLAVE INCORRECTA</div>
-</div>
+<div id="auth-err" class="fixed top-5 left-1/2 -translate-x-1/2 bg-red-600 text-white px-6 py-2 rounded-full font-black text-xs z-[2000] hidden">DATOS INCORRECTOS</div>
 
-<div id="auth-gate" class="flex items-center justify-center min-h-screen p-4">
+<div id="auth-gate" class="flex items-center justify-center min-h-screen p-6">
     <div class="glass p-8 w-full max-w-[380px] text-center">
-        <h1 class="neon-text text-2xl mb-8">REVIEWPOSITIVE</h1>
-        <div id="login-form" class="space-y-4">
-            <input type="email" id="l-email" placeholder="USUARIO / CORREO" class="input-q text-center">
+        <h1 class="neon-text text-2xl mb-2">REVIEWPOSITIVE</h1>
+        <div id="login-box" class="space-y-4">
+            <input type="email" id="l-email" placeholder="CORREO" class="input-q text-center">
             <input type="password" id="l-pass" placeholder="PASSWORD" class="input-q text-center">
-            <button onclick="intentarLogin()" class="btn-p">ENTRAR AL SISTEMA</button>
-            <p class="text-[10px] text-gray-500">¿No tienes cuenta? <span class="text-white underline cursor-pointer" onclick="toggleAuth()">Regístrate</span></p>
+            <button onclick="login()" class="btn-p">INICIAR SESIÓN</button>
+            <div class="flex items-center my-6"><hr class="flex-grow border-gray-800"><span class="px-3 text-[10px] text-gray-600 font-bold">O GOOGLE</span><hr class="flex-grow border-gray-800"></div>
+            <div class="flex justify-center w-full">
+                <div id="g_id_onload" data-client_id="599903299957-1u15almgd6dp4bsoq9bcmvk6j4k4loa7.apps.googleusercontent.com" data-callback="handleGoogleLogin"></div>
+                <div class="g_id_signin" data-type="standard" data-theme="filled_black" data-size="large"></div>
+            </div>
+            <p class="text-[10px] mt-6 text-gray-500">¿Nuevo? <span onclick="toggleAuth(true)" class="text-white underline cursor-pointer">Registrate</span></p>
+        </div>
+        <div id="reg-box" class="space-y-4 hidden">
+            <input type="text" id="r-nick" placeholder="APODO" class="input-q text-center">
+            <input type="email" id="r-email" placeholder="CORREO" class="input-q text-center">
+            <input type="password" id="r-pass" placeholder="CLAVE" class="input-q text-center">
+            <button onclick="register()" class="btn-p">CREAR CUENTA</button>
+            <p class="text-[10px] mt-6 text-gray-500">¿Ya tienes cuenta? <span onclick="toggleAuth(false)" class="text-white underline cursor-pointer">Logueate</span></p>
         </div>
     </div>
 </div>
 
 <div id="app-panel" class="hidden">
     <aside class="sidebar p-8">
-        <h2 class="neon-text text-lg mb-12">VZ ELITE</h2>
+        <div class="neon-text text-sm mb-12">VZ PREMIUM</div>
         <nav class="space-y-4">
-            <div onclick="nav('v-dash')" class="cursor-pointer font-bold text-gray-400 hover:text-white">🏠 INICIO</div>
-            <div onclick="nav('v-tasks')" class="cursor-pointer font-bold text-gray-400 hover:text-white">📋 TAREAS</div>
-            <div onclick="nav('v-hist')" class="cursor-pointer font-bold text-gray-400 hover:text-white">📊 HISTORIAL</div>
-            <div onclick="nav('v-wallet')" class="cursor-pointer font-bold text-gray-400 hover:text-white">💰 CAJERO</div>
-            <div id="adm-pc" class="hidden cursor-pointer font-bold text-yellow-500" onclick="nav('v-admin')">⚡ ADMIN</div>
+            <div class="cursor-pointer font-bold" onclick="nav('v-dash')">🏠 INICIO</div>
+            <div class="cursor-pointer font-bold text-gray-500" onclick="nav('v-tasks')">📋 TAREAS</div>
+            <div class="cursor-pointer font-bold text-gray-500" onclick="nav('v-hist')">📊 HISTORIAL</div>
+            <div class="cursor-pointer font-bold text-gray-500" onclick="nav('v-wallet')">💰 CAJERO</div>
+            <div id="btn-adm-pc" class="hidden cursor-pointer font-bold text-yellow-500" onclick="nav('v-admin')">⚡ ADMIN</div>
         </nav>
     </aside>
 
-    <nav class="mobile-nav">
-        <div onclick="nav('v-dash')" class="flex flex-col items-center">
-            <span class="text-xl">🏠</span><span class="text-[9px] font-black">HOME</span>
-        </div>
-        <div onclick="nav('v-tasks')" class="flex flex-col items-center">
-            <span class="text-xl">📋</span><span class="text-[9px] font-black">TAREAS</span>
-        </div>
-        <div onclick="nav('v-hist')" class="flex flex-col items-center">
-            <span class="text-xl">📊</span><span class="text-[9px] font-black">HIST</span>
-        </div>
-        <div onclick="nav('v-wallet')" class="flex flex-col items-center">
-            <span class="text-xl">💰</span><span class="text-[9px] font-black">PAGOS</span>
-        </div>
-        <div id="adm-mb" class="hidden flex flex-col items-center text-yellow-500" onclick="nav('v-admin')">
-            <span class="text-xl">⚡</span><span class="text-[9px] font-black">ADM</span>
-        </div>
+    <nav class="mobile-nav text-[10px] font-black uppercase">
+        <div onclick="nav('v-dash')" class="flex flex-col items-center"><span>🏠</span>INICIO</div>
+        <div onclick="nav('v-tasks')" class="flex flex-col items-center"><span>📋</span>TAREAS</div>
+        <div onclick="nav('v-hist')" class="flex flex-col items-center"><span>📊</span>HIST</div>
+        <div onclick="nav('v-wallet')" class="flex flex-col items-center"><span>💰</span>CAJA</div>
+        <div id="btn-adm-mb" class="hidden flex flex-col items-center text-yellow-500" onclick="nav('v-admin')"><span>⚡</span>ADM</div>
     </nav>
 
-    <main class="main-content">
+    <main class="main">
         <div id="v-dash" class="view active">
-            <h2 class="text-3xl font-black mb-8 italic uppercase" id="u-nick">CARGANDO...</h2>
-            <div class="grid grid-cols-1 gap-4 mb-6">
-                <div class="glass p-8 border-t-4 border-yellow-500">
-                    <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Saldo Retirable</p>
-                    <div id="u-saldo" class="text-5xl font-black text-white">$0.00</div>
-                </div>
+            <h1 class="text-3xl font-black mb-6 uppercase" id="u-nick">...</h1>
+            <div class="glass p-8 border-t-4 border-purple-600 text-center">
+                <p class="text-[10px] text-gray-500 font-bold uppercase mb-2">Saldo Disponible</p>
+                <div id="u-saldo" class="text-5xl font-black text-white">$0.00</div>
             </div>
         </div>
 
         <div id="v-tasks" class="view">
-            <h2 class="text-xl font-black mb-6 italic uppercase">Tareas Disponibles</h2>
-            <div id="tasks-container" class="space-y-4"></div>
+            <h2 class="text-xl font-black mb-6 italic uppercase">Tareas</h2>
+            <div id="tasks-list" class="space-y-4"></div>
         </div>
 
         <div id="v-hist" class="view">
-            <h2 class="text-xl font-black mb-6 italic uppercase">Mi Actividad</h2>
-            <div class="flex justify-around bg-black/40 rounded-t-xl mb-4">
-                <div id="t-all" class="tab-btn active" onclick="filtrarHist('todos')">TODAS</div>
-                <div id="t-pend" class="tab-btn" onclick="filtrarHist('pendiente')">PENDIENTES</div>
-                <div id="t-ok" class="tab-btn" onclick="filtrarHist('aprobado')">APROBADAS</div>
-                <div id="t-fail" class="tab-btn" onclick="filtrarHist('rechazado')">RECHAZADAS</div>
+            <h2 class="text-xl font-black mb-6 italic uppercase text-center">Mi Historial</h2>
+            <div class="flex border-b border-white/5 mb-4 bg-black/40 rounded-t-xl overflow-hidden">
+                <div onclick="renderHistorial('pendiente', this)" class="tab-hist active flex-grow">PENDIENTES</div>
+                <div onclick="renderHistorial('aprobado', this)" class="tab-hist flex-grow">APROBADAS</div>
+                <div onclick="renderHistorial('rechazado', this)" class="tab-hist flex-grow">RECHAZADAS</div>
             </div>
-            <div class="glass overflow-hidden">
-                <div id="historial-lista" class="divide-y divide-white/5">
-                    </div>
-            </div>
+            <div id="hist-content" class="space-y-3"></div>
         </div>
 
         <div id="v-wallet" class="view">
             <div class="max-w-[450px] mx-auto">
-                <div class="glass p-8 relative overflow-hidden">
-                    <div class="absolute -right-10 -top-10 w-40 h-40 bg-purple-600/10 rounded-full blur-3xl"></div>
-                    <h2 class="text-2xl font-black mb-1 italic">CAJERO VZ</h2>
-                    <p class="text-[9px] text-gray-500 mb-8 uppercase tracking-widest">Retiros procesados en menos de 24h</p>
-                    
-                    <div class="space-y-5">
-                        <div>
-                            <label class="text-[10px] font-bold text-gray-400 ml-2 mb-2 block uppercase">Método de Cobro</label>
-                            <select id="w-method" class="input-q">
-                                <option>Binance Pay (ID)</option>
-                                <option>USDT (TRC20)</option>
-                                <option>USDT (BEP20)</option>
-                                <option>USDT (APTOS)</option>
-                                <option>Zinli</option>
-                                <option>Pago Móvil VZLA</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-gray-400 ml-2 mb-2 block uppercase">Dirección de Pago</label>
-                            <input type="text" id="w-address" placeholder="Correo / ID / Wallet" class="input-q">
-                        </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-gray-400 ml-2 mb-2 block uppercase">Monto a retirar ($)</label>
-                            <input type="number" id="w-amount" placeholder="Mínimo $5.00" class="input-q">
-                        </div>
-                        <button onclick="pedirRetiro()" class="btn-p mt-4 shadow-lg shadow-purple-900/20">CONFIRMAR SOLICITUD DE RETIRO</button>
+                <div class="glass p-8 border-t-4 border-yellow-500 space-y-6">
+                    <h2 class="text-xl font-black italic">BILLETERA VZ</h2>
+                    <div>
+                        <label class="text-[10px] text-gray-500 block mb-2 font-bold uppercase">Red de Retiro</label>
+                        <select id="w-method" class="input-q">
+                            <option>Binance Pay (ID)</option>
+                            <option>USDT (TRC20)</option>
+                            <option>USDT (BEP20)</option>
+                            <option>USDT (APTOS)</option>
+                            <option>Zinli</option>
+                            <option>Pago Móvil VZLA</option>
+                        </select>
                     </div>
+                    <input type="text" id="w-address" placeholder="ID / Billetera / Correo" class="input-q">
+                    <input type="number" id="w-amount" placeholder="Monto (Min $5.00)" class="input-q">
+                    <button onclick="solicitarCobro()" class="btn-p">SOLICITAR RETIRO</button>
                 </div>
             </div>
         </div>
 
         <div id="v-admin" class="view">
-            <h2 class="text-2xl font-black mb-6 text-yellow-500 italic">MASTER CONTROL</h2>
-            <div class="grid grid-cols-1 gap-6">
-                <div class="glass p-6">
-                    <h3 class="text-sm font-black mb-4 uppercase">Publicar Nueva Tarea</h3>
-                    <div class="space-y-3">
-                        <input type="text" id="a-title" placeholder="Título del Negocio" class="input-q">
-                        <input type="text" id="a-link" placeholder="Link de Google Maps" class="input-q">
-                        <input type="number" id="a-pay" placeholder="Pago (ej: 0.50)" step="0.01" class="input-q">
-                        <input type="text" id="a-target" placeholder="Apodo del usuario (Opcional - Vacio=TODOS)" class="input-q">
-                        <button onclick="crearTarea()" class="btn-p">LANZAR TAREA AL SISTEMA</button>
-                    </div>
-                </div>
-                <div class="glass p-6">
-                    <h3 class="text-sm font-black mb-4 uppercase">Reseñas en Espera</h3>
-                    <div id="adm-revision-list" class="space-y-3"></div>
-                </div>
+            <h2 class="text-xl font-black mb-6 text-yellow-500 italic">PANEL MASTER</h2>
+            <div class="glass p-6 mb-6 space-y-4">
+                <p class="font-bold text-[10px] uppercase">Lanzar Tarea</p>
+                <input type="text" id="adm-title" placeholder="Título Negocio" class="input-q">
+                <input type="text" id="adm-link" placeholder="Link de Google Maps" class="input-q">
+                <input type="number" id="adm-pay" placeholder="Pago (0.80)" class="input-q">
+                <input type="text" id="adm-target" placeholder="Apodo del usuario (Opcional - Vacio=TODOS)" class="input-q">
+                <button onclick="crearTarea()" class="btn-p">PUBLICAR AHORA</button>
             </div>
+            <div id="adm-rev-list" class="space-y-3"></div>
+            <div id="adm-with-list" class="space-y-3 mt-6"></div>
         </div>
     </main>
 </div>
 
 <script>
-    // --- LÓGICA BASE DE DATOS (Mantenemos la que ya tienes, pero con correcciones) ---
-    let db = JSON.parse(localStorage.getItem('rp_db_real')) || { users: [], tasks: [], reviews: [], withdraws: [] };
-    function save() { localStorage.setItem('rp_db_real', JSON.stringify(db)); }
+    let db = JSON.parse(localStorage.getItem('rp_db_vz')) || { users: [], tasks: [], reviews: [], withdraws: [] };
+    function save() { localStorage.setItem('rp_db_vz', JSON.stringify(db)); }
 
     let user = null;
-    const ADMIN_MAIL = "nevinarg.2023@gmail.com";
+    const MASTER = "nevinarg.2023@gmail.com";
 
-    function intentarLogin() {
+    function handleGoogleLogin(res) {
+        const d = parseJwt(res.credential);
+        let u = db.users.find(x => x.email === d.email);
+        if(!u) {
+            u = { nick: d.given_name, email: d.email, pass: "google", saldo: 0 };
+            db.users.push(u); save();
+        }
+        user = u; launch();
+    }
+
+    function login() {
         const e = document.getElementById('l-email').value;
         const p = document.getElementById('l-pass').value;
-        const u = db.users.find(x => x.email === e || x.nick === e);
-
-        if(u && u.pass === p) {
-            user = u;
-            document.getElementById('auth-gate').classList.add('hidden');
-            document.getElementById('app-panel').classList.remove('hidden');
-            if(user.email === ADMIN_MAIL) {
-                document.getElementById('adm-pc').classList.remove('hidden');
-                document.getElementById('adm-mb').classList.remove('hidden');
-            }
-            refresh();
-        } else {
-            const err = document.getElementById('auth-error-msg');
-            err.classList.remove('hidden');
-            setTimeout(() => err.classList.add('hidden'), 3000);
+        const u = db.users.find(x => (x.email === e || x.nick === e) && x.pass === p);
+        if(u) { user = u; launch(); } else {
+            document.getElementById('auth-err').classList.remove('hidden');
+            setTimeout(() => document.getElementById('auth-err').classList.add('hidden'), 3000);
         }
     }
 
-    function nav(v) {
-        document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
-        document.getElementById(v).classList.add('active');
-        if(v === 'v-admin') renderAdmin();
+    function register() {
+        const n = document.getElementById('r-nick').value;
+        const e = document.getElementById('r-email').value;
+        const p = document.getElementById('r-pass').value;
+        if(!n || !e || !p) return;
+        db.users.push({ nick: n, email: e, pass: p, saldo: 0 });
+        save(); toggleAuth(false);
+    }
+
+    function launch() {
+        document.getElementById('auth-gate').classList.add('hidden');
+        document.getElementById('app-panel').classList.remove('hidden');
+        document.getElementById('u-nick').innerText = user.nick;
+        if(user.email === MASTER) {
+            document.getElementById('btn-adm-pc').classList.remove('hidden');
+            document.getElementById('btn-adm-mb').classList.remove('hidden');
+        }
+        refresh();
     }
 
     function refresh() {
-        document.getElementById('u-nick').innerText = user.nick;
         document.getElementById('u-saldo').innerText = `$${user.saldo.toFixed(2)}`;
-        renderTareas();
-        filtrarHist('todos');
+        renderTasks();
+        renderHistorial('pendiente', document.querySelector('.tab-hist'));
+        if(user.email === MASTER) renderAdmin();
     }
 
-    function renderTareas() {
-        const cont = document.getElementById('tasks-container');
+    function renderTasks() {
+        const cont = document.getElementById('tasks-list');
         cont.innerHTML = "";
-        // Filtrar tareas: Globales o específicas para el usuario
         const tasks = db.tasks.filter(t => !t.target || t.target.toLowerCase() === user.nick.toLowerCase());
-        
         tasks.forEach(t => {
-            // No mostrar si ya la hizo
             if(!db.reviews.find(r => r.taskId === t.id && r.user === user.email)) {
                 cont.innerHTML += `
-                <div class="glass p-5 border-l-4 border-[#bc13fe]">
-                    <div class="flex justify-between items-start">
-                        <span class="font-black text-xs italic uppercase">${t.title}</span>
-                        <span class="text-yellow-500 font-black">$${t.pay}</span>
-                    </div>
+                <div class="glass p-5 border-l-4 border-purple-500">
+                    <div class="flex justify-between font-black text-xs uppercase"><span>${t.title}</span><span class="text-yellow-500">$${t.pay}</span></div>
                     <div class="mt-4 flex gap-2">
-                        <a href="${t.link}" target="_blank" class="bg-white/10 px-4 py-2 rounded-lg text-[10px] font-bold">VER LINK</a>
-                        <input type="text" id="url-${t.id}" placeholder="Pega el link de tu reseña" class="input-q !p-2 text-[10px] flex-grow">
-                        <button onclick="enviar('${t.id}', ${t.pay})" class="btn-p !w-20 !p-2 !text-[9px]">SUBIR</button>
+                        <a href="${t.link}" target="_blank" class="bg-white/10 px-4 py-2 rounded text-[10px] font-bold">LINK</a>
+                        <input type="text" id="url-${t.id}" placeholder="Link reseña" class="input-q !p-2 text-[10px] flex-grow">
+                        <button onclick="enviar('${t.id}', ${t.pay})" class="btn-p !w-16 !p-2 !text-[9px]">SUBIR</button>
                     </div>
                 </div>`;
             }
         });
     }
 
-    function filtrarHist(status) {
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        const body = document.getElementById('historial-lista');
-        body.innerHTML = "";
-        
-        let logs = db.reviews.filter(r => r.user === user.email);
-        if(status !== 'todos') logs = logs.filter(r => r.status === status);
-
-        if(logs.length === 0) body.innerHTML = "<p class='p-8 text-center text-gray-600 text-xs font-bold'>NO HAY REGISTROS</p>";
-
+    function renderHistorial(stat, el) {
+        document.querySelectorAll('.tab-hist').forEach(t => t.classList.remove('active'));
+        if(el) el.classList.add('active');
+        const cont = document.getElementById('hist-content');
+        cont.innerHTML = "";
+        const logs = db.reviews.filter(r => r.user === user.email && r.status === stat);
         logs.reverse().forEach(r => {
-            const badgeClass = r.status === 'aprobado' ? 'badge-ok' : r.status === 'rechazado' ? 'badge-fail' : 'badge-pend';
-            body.innerHTML += `
-            <div class="p-4 flex justify-between items-center bg-black/20">
-                <div>
-                    <p class="text-[10px] font-black italic uppercase">${r.title}</p>
-                    <p class="text-[12px] font-black text-yellow-500">$${r.pay.toFixed(2)}</p>
-                </div>
-                <span class="badge ${badgeClass}">${r.status}</span>
+            cont.innerHTML += `<div class="glass p-4 flex justify-between items-center text-[10px]">
+                <div><b>${r.title}</b><br><span class="text-gray-500 text-[8px]">${r.url.substring(0,25)}...</span></div>
+                <div class="badge bg-${r.status === 'aprobado' ? 'ok' : r.status === 'rechazado' ? 'fail' : 'pend'}">${r.status}</div>
             </div>`;
         });
     }
@@ -271,45 +239,51 @@
     function enviar(tid, pay) {
         const url = document.getElementById(`url-${tid}`).value;
         if(!url) return;
-        db.reviews.push({ id: Date.now(), taskId: tid, title: db.tasks.find(x=>x.id==tid).title, user: user.email, nick: user.nick, url: url, pay: pay, status: 'pendiente' });
+        db.reviews.push({ id: Date.now(), taskId: tid, title: db.tasks.find(x=>x.id==tid).title, user: user.email, nick: user.nick, url, pay, status: 'pendiente' });
         save(); refresh();
     }
 
-    function pedirRetiro() {
-        const amount = parseFloat(document.getElementById('w-amount').value);
-        if(amount < 5 || amount > user.saldo) return alert("SALDO INSUFICIENTE O MONTO INVÁLIDO");
-        db.withdraws.push({ id: Date.now(), nick: user.nick, amount, method: document.getElementById('w-method').value, data: document.getElementById('w-address').value, status: 'pendiente' });
-        user.saldo -= amount;
-        save(); refresh();
-        alert("SOLICITUD ENVIADA AL ADMIN");
+    function solicitarCobro() {
+        const a = parseFloat(document.getElementById('w-amount').value);
+        if(a < 5 || a > user.saldo) return alert("SALDO INSUFICIENTE");
+        db.withdraws.push({ id: Date.now(), user: user.email, nick: user.nick, amount: a, method: document.getElementById('w-method').value, address: document.getElementById('w-address').value, status: 'pendiente' });
+        user.saldo -= a; save(); refresh();
     }
 
-    // --- FUNCIONES ADMIN ---
     function crearTarea() {
-        const t = { id: Date.now(), title: document.getElementById('a-title').value, link: document.getElementById('a-link').value, pay: parseFloat(document.getElementById('a-pay').value), target: document.getElementById('a-target').value };
-        db.tasks.push(t); save(); renderAdmin(); alert("TAREA LANZADA");
+        const t = { id: Date.now(), title: document.getElementById('adm-title').value, link: document.getElementById('adm-link').value, pay: parseFloat(document.getElementById('adm-pay').value), target: document.getElementById('adm-target').value };
+        db.tasks.push(t); save(); refresh();
     }
 
     function renderAdmin() {
-        const revCont = document.getElementById('adm-revision-list');
-        revCont.innerHTML = db.reviews.filter(r => r.status === 'pendiente').map(r => `
-            <div class="bg-black/40 p-4 rounded-xl flex justify-between items-center text-[10px]">
-                <div><b>${r.nick}</b> ($${r.pay})<br><a href="${r.url}" target="_blank" class="text-blue-400">VER RESEÑA</a></div>
-                <div class="flex gap-1">
-                    <button onclick="decidir('${r.id}', 'aprobado')" class="bg-green-600 p-2 rounded font-bold">OK</button>
-                    <button onclick="decidir('${r.id}', 'rechazado')" class="bg-red-600 p-2 rounded font-bold">X</button>
-                </div>
+        document.getElementById('adm-rev-list').innerHTML = "<b class='text-[10px]'>REVISIÓN:</b>" + db.reviews.filter(r => r.status === 'pendiente').map(r => `
+            <div class="glass p-3 flex justify-between text-[10px] items-center">
+                <div><b>${r.nick}</b> ($${r.pay})<br><a href="${r.url}" target="_blank" class="text-blue-500">VER LINK</a></div>
+                <div class="flex gap-1"><button onclick="decidirRes('${r.id}', 'aprobado')" class="bg-green-600 p-2 rounded">OK</button><button onclick="decidirRes('${r.id}', 'rechazado')" class="bg-red-600 p-2 rounded">X</button></div>
+            </div>`).join('');
+
+        document.getElementById('adm-with-list').innerHTML = "<b class='text-[10px]'>COBROS:</b>" + db.withdraws.filter(w => w.status === 'pendiente').map(w => `
+            <div class="glass p-3 flex justify-between text-[10px] items-center">
+                <div><b>${w.nick}</b> ($${w.amount})<br>${w.method}: ${w.address}</div>
+                <button onclick="pagar('${w.id}')" class="bg-yellow-600 px-3 py-1 rounded">PAGADO</button>
             </div>`).join('');
     }
 
-    function decidir(rid, stat) {
+    function decidirRes(rid, stat) {
         const r = db.reviews.find(x => x.id == rid);
         const u = db.users.find(x => x.email === r.user);
         if(stat === 'aprobado') u.saldo += r.pay;
-        r.status = stat;
-        save(); renderAdmin();
+        r.status = stat; save(); refresh();
     }
-</script>
 
+    function pagar(wid) {
+        db.withdraws.find(x => x.id == wid).status = 'pagado';
+        save(); refresh();
+    }
+
+    function toggleAuth(reg) { document.getElementById('login-box').classList.toggle('hidden', reg); document.getElementById('reg-box').classList.toggle('hidden', !reg); }
+    function nav(v) { document.querySelectorAll('.view').forEach(x => x.classList.remove('active')); document.getElementById(v).classList.add('active'); }
+    function parseJwt(t) { var b64 = t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'); return JSON.parse(decodeURIComponent(atob(b64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''))); }
+</script>
 </body>
 </html>
