@@ -3,347 +3,287 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ReviewPositive | Dashboard</title>
+    <title>ReviewPositive | Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Inter:wght@300;400;700&display=swap');
-        :root { --neon: #bc13fe; --gold: #ffcc00; --red: #ff4444; --green: #00ff88; }
-        
-        body { 
-            background-color: #030305;
-            background-image: radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)), radial-gradient(2px 2px at 40px 70px, #fff, rgba(0,0,0,0)), radial-gradient(2px 2px at 50px 160px, #ddd, rgba(0,0,0,0)), radial-gradient(2px 2px at 90px 40px, #fff, rgba(0,0,0,0)), radial-gradient(2px 2px at 130px 80px, #fff, rgba(0,0,0,0)), radial-gradient(2px 2px at 160px 120px, #ddd, rgba(0,0,0,0));
-            background-repeat: repeat; background-size: 200px 200px; animation: starsAnim 150s linear infinite;
-            color: #e2e8f0; font-family: 'Inter', sans-serif; min-height: 100vh; margin: 0; overflow-x: hidden; 
-        }
-        @keyframes starsAnim { 0% { background-position: 0 0; } 100% { background-position: -2000px 2000px; } }
-
-        .neon-text { color: var(--neon); text-shadow: 0 0 15px rgba(188, 19, 254, 0.6); font-family: 'Orbitron', sans-serif; }
-        .glass { background: rgba(10, 10, 15, 0.90); backdrop-filter: blur(15px); border: 1px solid rgba(188, 19, 254, 0.2); border-radius: 15px; }
-        .input-q { background: rgba(0,0,0,0.8); border: 1px solid rgba(188,19,254,0.3); color: white; padding: 0.9rem; border-radius: 10px; width: 100%; font-size: 0.85rem; outline: none; transition: 0.3s; }
-        .btn-p { background: linear-gradient(135deg, #bc13fe 0%, #6a0dad 100%); padding: 0.9rem; border-radius: 10px; font-weight: 900; font-family: 'Orbitron'; font-size: 0.8rem; color: white; width: 100%; border: none; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
-
-        .sidebar { width: 260px; height: 100vh; position: fixed; left: 0; top: 0; background: rgba(0,0,0,0.95); border-right: 1px solid #1a1a1a; z-index: 100; display: flex; flex-direction: column; }
-        .main { margin-left: 260px; padding: 30px; padding-bottom: 50px; }
-        
+        :root { --neon: #bc13fe; --gold: #ffcc00; }
+        body { background: #050505; color: #e2e8f0; font-family: 'Inter', sans-serif; min-height: 100vh; margin: 0; }
+        .neon-text { color: var(--neon); text-shadow: 0 0 15px rgba(188, 19, 254, 0.6); font-family: 'Orbitron'; }
+        .glass { background: rgba(15, 15, 20, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(188, 19, 254, 0.2); border-radius: 12px; }
+        .input-q { background: #000; border: 1px solid #333; color: white; padding: 12px; border-radius: 8px; width: 100%; outline: none; }
+        .btn-p { background: linear-gradient(135deg, #bc13fe, #6a0dad); padding: 12px; border-radius: 8px; font-weight: 900; font-family: 'Orbitron'; color: white; width: 100%; border: none; cursor: pointer; transition: 0.3s; }
+        .sidebar { width: 260px; height: 100vh; position: fixed; left: 0; top: 0; background: #000; border-right: 1px solid #1a1a1a; z-index: 100; display: flex; flex-direction: column; }
+        .main { margin-left: 260px; padding: 30px; }
         @media (max-width: 768px) { 
-            .sidebar { display: none !important; } 
-            .main { margin-left: 0; padding: 15px; padding-bottom: 100px; } 
-            .mobile-nav { display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; bottom: 0; left: 0; width: 100%; background: #000; height: 75px; z-index: 1000; border-top: 2px solid var(--neon); } 
-            .nav-item-m { display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 8px; font-weight: 900; color: #666; }
-            .nav-item-m.active-m { color: white; }
-            .nav-item-m span { font-size: 18px; } 
+            .sidebar { display: none; } .main { margin-left: 0; padding-bottom: 100px; }
+            .mobile-nav { display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; bottom: 0; width: 100%; background: #000; height: 70px; border-top: 2px solid var(--neon); z-index: 1000; }
+            .nav-item-m { display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 9px; color: #555; }
+            .nav-item-m.active { color: white; }
         }
-
-        .view { display: none; } .view.active { display: block; animation: fadeIn 0.4s; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .view { display: none; } .view.active { display: block; }
+        .status-pill { padding: 2px 8px; border-radius: 4px; font-size: 9px; font-weight: bold; text-transform: uppercase; }
+        .status-pendiente { background: #555; }
+        .status-aprobado { background: #00ff88; color: #000; }
     </style>
 </head>
-<body>
+<body onload="checkSession()">
 
-<div id="alert-msg" class="fixed top-5 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full font-black text-xs z-[2000] hidden text-white shadow-xl transition-all"></div>
+<div id="alert-msg" class="fixed top-5 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full font-black text-xs z-[3000] hidden text-white shadow-xl bg-red-600"></div>
 
-<div id="auth-gate" class="flex items-center justify-center min-h-screen p-6 relative z-10">
-    <div class="glass p-8 w-full max-w-[380px] text-center shadow-2xl">
-        <h1 class="neon-text text-2xl mb-8">REVIEWPOSITIVE</h1>
-        
+<div id="auth-gate" class="flex items-center justify-center min-h-screen p-6">
+    <div class="glass p-8 w-full max-w-[360px] text-center">
+        <h1 class="neon-text text-xl mb-6">REVIEWPOSITIVE</h1>
         <div id="login-box" class="space-y-4">
-            <input type="email" id="l-email" placeholder="Correo o Apodo" class="input-q text-center">
-            <input type="password" id="l-pass" placeholder="Contraseña" class="input-q text-center">
-            <button onclick="login()" class="btn-p shadow-lg shadow-purple-900/50">INICIAR SESIÓN</button>
-            
-            <div class="flex items-center my-6"><hr class="flex-grow border-gray-800"><span class="px-3 text-[10px] text-gray-500 font-bold uppercase">O Google</span><hr class="flex-grow border-gray-800"></div>
-            
-            <div class="flex justify-center w-full overflow-hidden">
-                <div id="g_id_onload" data-client_id="599903299957-1u15almgd6dp4bsoq9bcmvk6j4k4loa7.apps.googleusercontent.com" data-callback="handleGoogleLogin"></div>
-                <div class="g_id_signin" data-type="standard" data-theme="filled_black" data-size="large"></div>
-            </div>
-
-            <p class="text-[11px] mt-6 text-gray-400">¿No tienes cuenta? <span onclick="toggleAuth(true)" class="text-white font-bold underline cursor-pointer">Regístrate</span></p>
+            <input type="text" id="l-user" placeholder="Email o Nick" class="input-q">
+            <input type="password" id="l-pass" placeholder="Contraseña" class="input-q">
+            <button onclick="login()" class="btn-p">ENTRAR</button>
+            <div id="g_id_onload" data-client_id="599903299957-1u15almgd6dp4bsoq9bcmvk6j4k4loa7.apps.googleusercontent.com" data-callback="handleGoogleLogin"></div>
+            <div class="g_id_signin mt-4 flex justify-center" data-type="standard" data-theme="filled_black"></div>
+            <p class="text-[10px] mt-4">¿No tienes cuenta? <span onclick="toggleAuth(true)" class="underline cursor-pointer">Regístrate</span></p>
         </div>
-
         <div id="reg-box" class="space-y-4 hidden">
-            <input type="text" id="r-nick" placeholder="Apodo" class="input-q text-center">
-            <input type="email" id="r-email" placeholder="Correo Electrónico" class="input-q text-center">
-            <input type="password" id="r-pass" placeholder="Contraseña" class="input-q text-center">
-            <input type="text" id="r-ref" placeholder="Código de Referido (Opcional)" class="input-q text-center border-yellow-500/50">
-            <button onclick="register()" class="btn-p">CREAR MI CUENTA</button>
-            <p class="text-[11px] mt-6 text-gray-400">¿Ya eres miembro? <span onclick="toggleAuth(false)" class="text-white font-bold underline cursor-pointer">Inicia Sesión</span></p>
+            <input type="text" id="r-nick" placeholder="Apodo" class="input-q">
+            <input type="email" id="r-email" placeholder="Email" class="input-q">
+            <input type="password" id="r-pass" placeholder="Contraseña" class="input-q">
+            <input type="text" id="r-ref" placeholder="Código Referido (Opcional)" class="input-q">
+            <button onclick="register()" class="btn-p">CREAR CUENTA</button>
+            <p class="text-[10px] mt-4" onclick="toggleAuth(false)">Volver al login</p>
         </div>
     </div>
 </div>
 
-<div id="app-panel" class="hidden relative z-10">
-    <aside class="sidebar p-8">
-        <div class="neon-text text-xl mb-10 text-center">REVIEWPOSITIVE</div>
-        <nav class="space-y-4 flex-grow">
-            <div class="cursor-pointer font-bold text-gray-300 hover:text-white" onclick="nav('v-dash')">🏠 DASHBOARD</div>
-            <div class="cursor-pointer font-bold text-gray-500 hover:text-white" onclick="nav('v-tasks')">📋 TAREAS</div>
-            <div class="cursor-pointer font-bold text-gray-500 hover:text-white" onclick="nav('v-refs')">👥 REFERIDOS</div>
-            <div class="cursor-pointer font-bold text-gray-500 hover:text-white" onclick="nav('v-wallet')">💰 CAJERO</div>
-            <div id="btn-adm-pc" class="hidden cursor-pointer font-black text-yellow-500 pt-6 border-t border-white/10" onclick="nav('v-admin')">⚡ PANEL ADMIN</div>
+<div id="app-panel" class="hidden">
+    <aside class="sidebar p-6">
+        <div class="neon-text text-lg mb-10">RP DASHBOARD</div>
+        <nav class="space-y-4 flex-grow font-bold text-gray-400">
+            <div onclick="nav('v-dash')" class="hover:text-white cursor-pointer">DASHBOARD</div>
+            <div onclick="nav('v-tasks')" class="hover:text-white cursor-pointer">TAREAS</div>
+            <div onclick="nav('v-wallet')" class="hover:text-white cursor-pointer">RETIRAR</div>
+            <div id="adm-btn" class="hidden text-yellow-500 pt-4 border-t border-white/10 cursor-pointer" onclick="nav('v-admin')">ADMIN CONTROL</div>
         </nav>
-        <button onclick="logout()" class="text-red-500 font-bold text-xs uppercase p-3 mt-auto">Cerrar Sesión</button>
+        <button onclick="logout()" class="text-red-500 text-[10px] font-bold">CERRAR SESIÓN</button>
     </aside>
 
     <nav class="mobile-nav md:hidden">
-        <div onclick="nav('v-dash')" class="nav-item-m active-m"><span>🏠</span>INICIO</div>
-        <div onclick="nav('v-tasks')" class="nav-item-m"><span>📋</span>TAREAS</div>
-        <div onclick="nav('v-refs')" class="nav-item-m"><span>👥</span>REFS</div>
-        <div onclick="nav('v-wallet')" class="nav-item-m"><span>💰</span>CAJA</div>
-        <div id="btn-adm-mb" class="hidden nav-item-m text-yellow-500" onclick="nav('v-admin')"><span>⚡</span>ADM</div>
+        <div onclick="nav('v-dash')" class="nav-item-m active">🏠</div>
+        <div onclick="nav('v-tasks')" class="nav-item-m">📋</div>
+        <div onclick="nav('v-wallet')" class="nav-item-m">💰</div>
+        <div id="adm-btn-mb" class="hidden nav-item-m text-yellow-500" onclick="nav('v-admin')">⚡</div>
     </nav>
 
     <main class="main">
         <div id="v-dash" class="view active">
-            <h1 class="text-3xl font-black mb-1 uppercase" id="u-nick">...</h1>
-            <p class="text-[10px] text-yellow-500 mb-8 font-bold">INVITACIÓN: <span id="u-ref-display" class="text-white">---</span></p>
-            <div class="glass p-8 border-t-4 border-[#bc13fe] text-center max-w-md">
-                <p class="text-[10px] text-gray-400 font-bold uppercase mb-2">Saldo Retirable</p>
-                <div id="u-saldo" class="text-5xl font-black text-white">$0.00</div>
+            <h1 class="text-2xl font-black mb-1 uppercase" id="u-nick">...</h1>
+            <p class="text-[10px] text-yellow-500 mb-6">REF: <span id="u-ref-code" class="text-white">---</span></p>
+            <div class="glass p-6 max-w-sm border-t-2 border-purple-600">
+                <p class="text-[9px] uppercase font-bold text-gray-500">Saldo Disponible</p>
+                <div id="u-saldo" class="text-4xl font-black">$0.00</div>
             </div>
         </div>
 
         <div id="v-tasks" class="view">
-            <h2 class="text-xl font-black mb-6 italic uppercase">Tareas Disponibles</h2>
-            <div id="tasks-list" class="space-y-4"></div>
-        </div>
-
-        <div id="v-refs" class="view">
-            <h2 class="text-xl font-black mb-6 italic uppercase">Mis Referidos</h2>
-            <div class="glass p-6 mb-6">
-                <p class="text-[10px] text-gray-400 font-bold uppercase mb-2">Tu Link de Invitación</p>
-                <div class="flex gap-2">
-                    <input type="text" id="u-ref-link" readonly class="input-q !p-2 text-[10px] flex-grow">
-                    <button onclick="copyRef()" class="btn-p !w-20 !p-2 !text-[9px]">COPIAR</button>
-                </div>
-            </div>
-            <div id="ref-list" class="space-y-2"></div>
+            <h2 class="font-black mb-4 italic">TAREAS DISPONIBLES</h2>
+            <div id="tasks-list" class="space-y-4 mb-10"></div>
+            
+            <h2 class="font-black mb-4 italic text-gray-500">MI HISTORIAL DE RESEÑAS</h2>
+            <div id="my-reviews" class="space-y-2 text-[11px]"></div>
         </div>
 
         <div id="v-wallet" class="view">
-            <div class="max-w-[450px] glass p-8 border-t-4 border-yellow-500 space-y-6">
-                <h2 class="text-2xl font-black italic">RETIRO</h2>
-                <select id="w-method" class="input-q">
-                    <option>Bybit Pay (ID)</option>
-                    <option>Binance Pay (ID)</option>
-                    <option>Zinli</option>
-                    <option>Pago Móvil VZLA</option>
-                    <option>USDT (TRC20)</option>
-                </select>
-                <input type="text" id="w-address" placeholder="ID / Billetera / Datos de pago" class="input-q">
-                <input type="number" id="w-amount" placeholder="Monto (Mín $5.00)" class="input-q">
-                <button onclick="solicitarCobro()" class="btn-p">PROCESAR</button>
+            <div class="glass p-6 max-w-md space-y-4">
+                <h2 class="font-black italic">SOLICITAR PAGO</h2>
+                <select id="w-method" class="input-q"><option>Bybit Pay</option><option>Binance Pay</option><option>Pago Movil</option></select>
+                <input type="text" id="w-address" placeholder="ID o Datos" class="input-q">
+                <input type="number" id="w-amount" placeholder="Monto" class="input-q">
+                <button onclick="withdraw()" class="btn-p">RETIRAR</button>
             </div>
         </div>
 
         <div id="v-admin" class="view">
-            <h2 class="text-2xl font-black mb-6 text-yellow-500 italic uppercase">Master Control</h2>
-            <div class="flex gap-2 mb-6 overflow-x-auto pb-2">
-                <button onclick="admNav('adm-v-pub')" class="bg-gray-800 text-[10px] p-3 rounded font-bold">TAREAS</button>
-                <button onclick="admNav('adm-v-rev')" class="bg-gray-800 text-[10px] p-3 rounded font-bold">REVISIONES</button>
-                <button onclick="admNav('adm-v-with')" class="bg-gray-800 text-[10px] p-3 rounded font-bold">RETIROS</button>
-                <button onclick="admNav('adm-v-users')" class="bg-gray-800 text-[10px] p-3 rounded font-bold">USUARIOS</button>
+            <div class="flex gap-4 mb-6 text-[10px] font-black overflow-x-auto">
+                <button onclick="admS('a-u')" class="bg-purple-900 px-4 py-2 rounded">USUARIOS</button>
+                <button onclick="admS('a-r')" class="bg-gray-800 px-4 py-2 rounded">REVISAR</button>
+                <button onclick="admS('a-w')" class="bg-gray-800 px-4 py-2 rounded">PAGOS</button>
             </div>
-
-            <div id="adm-v-pub" class="adm-section glass p-6 space-y-4">
-                <input type="text" id="adm-title" placeholder="Negocio" class="input-q">
-                <input type="text" id="adm-link" placeholder="Link Maps" class="input-q">
-                <input type="number" id="adm-pay" placeholder="Pago (Ej: 0.80)" class="input-q">
-                <input type="text" id="adm-target" placeholder="Para quien? (Vacío = Todos)" class="input-q">
-                <button onclick="crearTarea()" class="btn-p bg-yellow-600">LANZAR</button>
-            </div>
-            <div id="adm-v-rev" class="adm-section hidden space-y-3"><div id="adm-rev-list"></div></div>
-            <div id="adm-v-with" class="adm-section hidden space-y-3"><div id="adm-with-list"></div></div>
-            <div id="adm-v-users" class="adm-section hidden space-y-3"><div id="adm-users-list"></div></div>
+            <div id="a-u" class="adm-sec space-y-2"></div>
+            <div id="a-r" class="adm-sec hidden space-y-2"></div>
+            <div id="a-w" class="adm-sec hidden space-y-2"></div>
         </div>
     </main>
 </div>
 
 <script>
-    // --- CONFIG SUPABASE ---
-    /* const supabaseUrl = 'TU_URL';
-    const supabaseKey = 'TU_KEY';
-    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-    */
+    const MASTER_EMAIL = "nevinarg.2023@gmail.com";
+    let db = JSON.parse(localStorage.getItem('RP_DB')) || { users: [], tasks: [], reviews: [], withdraws: [] };
+    let currentUser = JSON.parse(localStorage.getItem('RP_SESSION')) || null;
 
-    let db = JSON.parse(localStorage.getItem('rp_db_v4')) || { users: [], tasks: [], reviews: [], withdraws: [] };
-    async function apiSave() { localStorage.setItem('rp_db_v4', JSON.stringify(db)); }
-    
-    let user = null;
-    const MASTER = "nevinarg.2023@gmail.com";
-
-    function showMsg(text, type="error") {
-        const el = document.getElementById('alert-msg');
-        el.innerText = text;
-        el.className = `fixed top-5 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full font-black text-[11px] z-[2000] text-white shadow-xl ${type==='error'?'bg-red-600':'bg-green-500'}`;
-        el.classList.remove('hidden');
-        setTimeout(() => el.classList.add('hidden'), 3000);
+    function save() { localStorage.setItem('RP_DB', JSON.stringify(db)); }
+    function msg(t, ok=false) { 
+        const e = document.getElementById('alert-msg'); 
+        e.innerText = t; e.style.background = ok ? '#00ff88' : '#ff4444';
+        e.classList.remove('hidden'); setTimeout(()=>e.classList.add('hidden'), 3000);
     }
 
-    function nav(v) {
-        document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
-        document.getElementById(v).classList.add('active');
-        document.querySelectorAll('.nav-item-m').forEach(x => x.classList.remove('active-m'));
-        if(v === 'v-admin') { renderAdminRevs(); renderAdminWiths(); renderAdminUsers(); }
-        if(v === 'v-refs') { renderReferidos(); }
+    function checkSession() {
+        if(currentUser) launch();
     }
 
-    // --- AUTH ---
-    function handleGoogleLogin(res) {
-        const d = parseJwt(res.credential);
-        let u = db.users.find(x => x.email === d.email);
-        if(!u) {
-            u = { nick: d.given_name, email: d.email, pass: "google", saldo: 0, refCode: "G"+Math.floor(Math.random()*999), referredBy: null, banned: false };
-            db.users.push(u); apiSave();
-        }
-        if(u.banned) return showMsg("Cuenta Baneada");
-        user = u; launch();
+    function toggleAuth(reg) { 
+        document.getElementById('login-box').classList.toggle('hidden', reg);
+        document.getElementById('reg-box').classList.toggle('hidden', !reg);
     }
 
-    async function login() {
-        const e = document.getElementById('l-email').value;
+    function login() {
+        const u = document.getElementById('l-user').value;
         const p = document.getElementById('l-pass').value;
-        const u = db.users.find(x => (x.email === e || x.nick === e) && x.pass === p);
-        if(u) {
-            if(u.banned) return showMsg("Cuenta suspendida");
-            user = u; launch(); 
-        } else showMsg("Credenciales fallidas");
+        const found = db.users.find(x => (x.email === u || x.nick === u) && x.pass === p);
+        if(found) { 
+            if(found.banned) return msg("Baneado");
+            currentUser = found; 
+            localStorage.setItem('RP_SESSION', JSON.stringify(found));
+            launch(); 
+        } else msg("Error");
     }
 
-    async function register() {
+    function handleGoogleLogin(res) {
+        const payload = JSON.parse(atob(res.credential.split('.')[1]));
+        let found = db.users.find(x => x.email === payload.email);
+        if(!found) {
+            found = { nick: payload.given_name, email: payload.email, pass: 'google', saldo: 0, refCode: 'G'+Math.floor(Math.random()*999), banned: false };
+            db.users.push(found); save();
+        }
+        currentUser = found;
+        localStorage.setItem('RP_SESSION', JSON.stringify(found));
+        launch();
+    }
+
+    function register() {
         const n = document.getElementById('r-nick').value;
         const e = document.getElementById('r-email').value;
         const p = document.getElementById('r-pass').value;
         const r = document.getElementById('r-ref').value;
-        if(!n || !e || !p) return showMsg("Completa todo");
-        if(db.users.find(x => x.email === e || x.nick === n)) return showMsg("Ya existe");
-
-        const myCode = n.substring(0,3).toUpperCase() + Math.floor(Math.random()*99);
-        db.users.push({ nick: n, email: e, pass: p, saldo: 0, refCode: myCode, referredBy: r, banned: false });
-        await apiSave();
-        showMsg("Registrado. Logueate", "ok");
-        toggleAuth(false);
+        if(!n || !e || !p) return msg("Faltan datos");
+        if(db.users.find(x => x.email === e)) return msg("Ya existe");
+        
+        const newUser = { nick: n, email: e, pass: p, saldo: 0, refCode: n.slice(0,3)+Math.floor(Math.random()*99), referredBy: r, banned: false };
+        db.users.push(newUser); save();
+        msg("Registrado!", true); toggleAuth(false);
     }
 
     function launch() {
         document.getElementById('auth-gate').classList.add('hidden');
         document.getElementById('app-panel').classList.remove('hidden');
-        document.getElementById('u-nick').innerText = user.nick;
-        document.getElementById('u-ref-display').innerText = user.refCode;
-        document.getElementById('u-ref-link').value = window.location.origin + "?ref=" + user.refCode;
-        if(user.email === MASTER) {
-            document.getElementById('btn-adm-pc').classList.remove('hidden');
-            document.getElementById('btn-adm-mb').classList.remove('hidden');
+        document.getElementById('u-nick').innerText = currentUser.nick;
+        document.getElementById('u-ref-code').innerText = currentUser.refCode;
+        if(currentUser.email === MASTER_EMAIL) {
+            document.getElementById('adm-btn').classList.remove('hidden');
+            document.getElementById('adm-btn-mb').classList.remove('hidden');
         }
         refresh();
     }
 
     function refresh() {
-        document.getElementById('u-saldo').innerText = `$${user.saldo.toFixed(2)}`;
+        // Sincronizar currentUser con el saldo real en DB
+        const realU = db.users.find(x => x.email === currentUser.email);
+        document.getElementById('u-saldo').innerText = `$${realU.saldo.toFixed(2)}`;
         renderTasks();
+        renderMyReviews();
     }
 
-    // --- CORE ---
+    function nav(v) {
+        document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
+        document.getElementById(v).classList.add('active');
+        if(v === 'v-admin') renderAdmin();
+    }
+
     function renderTasks() {
         const cont = document.getElementById('tasks-list');
-        cont.innerHTML = "";
-        const tasks = db.tasks.filter(t => !t.target || t.target.toLowerCase() === user.nick.toLowerCase());
-        tasks.forEach(t => {
-            if(!db.reviews.find(r => r.taskId === t.id && r.user === user.email)) {
-                cont.innerHTML += `<div class="glass p-5 border-l-4 border-[#bc13fe]">
-                    <div class="flex justify-between font-black text-[11px] uppercase"><span>${t.title}</span><span class="text-yellow-500">$${t.pay}</span></div>
-                    <div class="mt-4 flex gap-2">
-                        <a href="${t.link}" target="_blank" class="bg-white/10 px-3 py-2 rounded text-[9px] font-bold">MAPS</a>
-                        <input type="text" id="url-${t.id}" placeholder="Link de reseña" class="input-q !p-2 text-[10px] flex-grow">
-                        <button onclick="enviarRes('${t.id}', ${t.pay})" class="btn-p !w-16 !p-2 !text-[9px]">OK</button>
+        cont.innerHTML = db.tasks.length ? '' : '<p class="text-[10px] text-gray-600">No hay tareas</p>';
+        db.tasks.forEach(t => {
+            if(!db.reviews.find(r => r.taskId === t.id && r.user === currentUser.email)) {
+                cont.innerHTML += `<div class="glass p-4 border-l-4 border-purple-500">
+                    <div class="flex justify-between font-black text-xs uppercase"><span>${t.name}</span><span class="text-green-400">$${t.pay}</span></div>
+                    <div class="flex gap-2 mt-4">
+                        <a href="${t.link}" target="_blank" class="bg-white/10 p-2 rounded text-[10px]">MAPS</a>
+                        <input id="link-${t.id}" placeholder="Pega Link Reseña" class="input-q !p-2 flex-grow text-[10px]">
+                        <button onclick="sendReview('${t.id}')" class="bg-purple-600 p-2 rounded text-[10px] font-bold">OK</button>
                     </div>
                 </div>`;
             }
         });
     }
 
-    async function enviarRes(tid, pay) {
-        const url = document.getElementById(`url-${tid}`).value;
-        if(!url) return showMsg("Pega el link");
-        db.reviews.push({ id: Date.now(), taskId: tid, title: db.tasks.find(x=>x.id==tid).title, user: user.email, nick: user.nick, url, pay, status: 'pendiente' });
-        await apiSave(); refresh(); showMsg("En revisión", "ok");
+    function renderMyReviews() {
+        const cont = document.getElementById('my-reviews');
+        const mios = db.reviews.filter(r => r.user === currentUser.email);
+        cont.innerHTML = mios.map(r => `
+            <div class="bg-white/5 p-2 rounded flex justify-between items-center">
+                <span>${r.taskName}</span>
+                <span class="status-pill status-${r.status}">${r.status}</span>
+            </div>
+        `).join('') || 'Sin actividad';
     }
 
-    async function solicitarCobro() {
-        const a = parseFloat(document.getElementById('w-amount').value);
-        const m = document.getElementById('w-method').value;
-        const d = document.getElementById('w-address').value;
-        if(a < 5 || a > user.saldo || !d) return showMsg("Saldo insuficiente o datos vacíos");
-        db.withdraws.push({ id: Date.now(), user: user.email, nick: user.nick, amount: a, method: m, address: d, status: 'pendiente' });
-        user.saldo -= a; await apiSave(); refresh(); showMsg("Solicitud enviada", "ok");
+    function sendReview(tid) {
+        const l = document.getElementById(`link-${tid}`).value;
+        if(!l) return msg("Falta link");
+        const task = db.tasks.find(x => x.id == tid);
+        db.reviews.push({ id: Date.now(), taskId: tid, taskName: task.name, user: currentUser.email, nick: currentUser.nick, url: l, pay: task.pay, status: 'pendiente' });
+        save(); refresh(); msg("Enviada", true);
     }
 
-    function renderReferidos() {
-        const cont = document.getElementById('ref-list');
-        const mios = db.users.filter(u => u.referredBy === user.refCode);
-        cont.innerHTML = mios.length ? mios.map(u => `<div class="glass p-3 text-[10px] flex justify-between"><span>${u.nick}</span><span class="text-green-400">Activo</span></div>`).join('') : "<p class='text-center text-[10px] text-gray-500 uppercase'>Sin referidos</p>";
-    }
-
-    // --- ADMIN ---
-    function admNav(id) {
-        document.querySelectorAll('.adm-section').forEach(x => x.classList.add('hidden'));
+    function admS(id) { 
+        document.querySelectorAll('.adm-sec').forEach(x => x.classList.add('hidden'));
         document.getElementById(id).classList.remove('hidden');
     }
 
-    function renderAdminRevs() {
-        const revs = db.reviews.filter(r => r.status === 'pendiente');
-        document.getElementById('adm-rev-list').innerHTML = revs.map(r => `
-            <div class="glass p-3 text-[10px] flex justify-between items-center mb-2">
-                <div><b>${r.nick}</b> ($${r.pay})<br><a href="${r.url}" target="_blank" class="text-blue-400 underline">Link</a></div>
-                <div class="flex gap-1"><button onclick="decidirRes('${r.id}', 'aprobado')" class="bg-green-600 p-2 rounded">OK</button></div>
-            </div>`).join('');
+    function renderAdmin() {
+        // Usuarios
+        document.getElementById('a-u').innerHTML = db.users.map(u => `
+            <div class="glass p-3 flex justify-between text-[10px]">
+                <span>${u.nick} (${u.email}) - <b>$${u.saldo.toFixed(2)}</b></span>
+                <button onclick="ban('${u.email}')" class="text-red-500">${u.banned ? 'UNBAN' : 'BAN'}</button>
+            </div>
+        `).join('');
+        // Reseñas
+        document.getElementById('a-r').innerHTML = db.reviews.filter(r=>r.status==='pendiente').map(r => `
+            <div class="glass p-3 text-[10px]">
+                ${r.nick} -> ${r.taskName} ($${r.pay})<br>
+                <a href="${r.url}" target="_blank" class="text-blue-400">Ver Reseña</a>
+                <div class="flex gap-2 mt-2">
+                    <button onclick="approve('${r.id}', true)" class="bg-green-600 px-3 py-1 rounded">APROBAR</button>
+                    <button onclick="approve('${r.id}', false)" class="bg-red-600 px-3 py-1 rounded">RECHAZAR</button>
+                </div>
+            </div>
+        `).join('');
     }
 
-    async function decidirRes(rid, stat) {
+    function approve(rid, ok) {
         const r = db.reviews.find(x => x.id == rid);
-        if(stat === 'aprobado') { 
+        if(ok) {
             const u = db.users.find(x => x.email === r.user);
             u.saldo += r.pay;
             if(u.referredBy) {
-                const up = db.users.find(x => x.refCode === u.referredBy);
-                if(up) up.saldo += (r.pay * 0.10);
+                const boss = db.users.find(x => x.refCode === u.referredBy);
+                if(boss) boss.saldo += (r.pay * 0.10);
             }
         }
-        r.status = stat; await apiSave(); renderAdminRevs();
+        r.status = ok ? 'aprobado' : 'rechazado';
+        save(); renderAdmin(); refresh();
     }
 
-    function renderAdminWiths() {
-        document.getElementById('adm-with-list').innerHTML = db.withdraws.filter(w=>w.status==='pendiente').map(w => `
-            <div class="glass p-3 text-[10px] mb-2">
-                <b>${w.nick} - $${w.amount}</b><br>
-                ${w.method}: <span class="text-yellow-500">${w.address}</span>
-                <button onclick="pagar('${w.id}')" class="bg-green-600 p-1 mt-2 rounded w-full">PAGADO</button>
-            </div>`).join('');
+    function ban(em) {
+        if(em === MASTER_EMAIL) return;
+        const u = db.users.find(x => x.email === em);
+        u.banned = !u.banned; save(); renderAdmin();
     }
 
-    async function pagar(wid) { db.withdraws.find(x => x.id == wid).status = 'pagado'; await apiSave(); renderAdminWiths(); }
-
-    function renderAdminUsers() {
-        document.getElementById('adm-users-list').innerHTML = db.users.map(u => `
-            <div class="glass p-3 flex justify-between items-center text-[10px] mb-1">
-                <div><b>${u.nick}</b> - $${u.saldo.toFixed(2)}</div>
-                <button onclick="ban('${u.email}')" class="bg-red-600 p-2 rounded">${u.banned ? 'UNBAN' : 'BAN'}</button>
-            </div>`).join('');
+    function logout() { 
+        localStorage.removeItem('RP_SESSION'); 
+        location.reload(); 
     }
-
-    async function ban(em) { 
-        if(em === MASTER) return;
-        const u = db.users.find(x => x.email === em); u.banned = !u.banned; await apiSave(); renderAdminUsers(); 
-    }
-
-    // UTILS
-    function toggleAuth(reg) { document.getElementById('login-box').classList.toggle('hidden', reg); document.getElementById('reg-box').classList.toggle('hidden', !reg); }
-    function parseJwt(t) { var b64 = t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'); return JSON.parse(decodeURIComponent(atob(b64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''))); }
-    function logout() { location.reload(); }
-    function copyRef() { const input = document.getElementById('u-ref-link'); input.select(); document.execCommand('copy'); showMsg("Copiado!", "ok"); }
 </script>
 </body>
 </html>
