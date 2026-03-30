@@ -8,18 +8,21 @@
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Inter:wght@300;400;700&display=swap');
-        :root { --neon: #bc13fe; --gold: #ffcc00; --red: #ff4444; }
+        :root { --neon: #bc13fe; --gold: #ffcc00; --red: #ff4444; --green: #00ff88; }
         body { background: #030305; color: #e2e8f0; font-family: 'Inter', sans-serif; min-height: 100vh; margin: 0; }
-        .neon-text { color: #bc13fe; text-shadow: 0 0 15px rgba(188, 19, 254, 0.6); font-family: 'Orbitron', sans-serif; }
+        .neon-text { color: var(--neon); text-shadow: 0 0 15px rgba(188, 19, 254, 0.6); font-family: 'Orbitron', sans-serif; }
         .glass { background: rgba(10, 10, 15, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(188, 19, 254, 0.2); border-radius: 15px; }
         .input-q { background: rgba(0,0,0,0.7); border: 1px solid rgba(188,19,254,0.1); color: white; padding: 0.8rem; border-radius: 10px; width: 100%; font-size: 0.85rem; outline: none; }
-        .btn-p { background: linear-gradient(135deg, #bc13fe 0%, #6a0dad 100%); padding: 0.8rem; border-radius: 10px; font-weight: 900; font-family: 'Orbitron'; font-size: 0.7rem; color: white; transition: 0.3s; width: 100%; }
+        .btn-p { background: linear-gradient(135deg, #bc13fe 0%, #6a0dad 100%); padding: 0.8rem; border-radius: 10px; font-weight: 900; font-family: 'Orbitron'; font-size: 0.7rem; color: white; transition: 0.3s; width: 100%; cursor: pointer; border: none; }
         .sidebar { width: 260px; height: 100vh; position: fixed; background: #050508; border-right: 1px solid #1a1a1a; z-index: 50; }
         .mobile-nav { display: none; position: fixed; bottom: 0; width: 100%; background: #050508; height: 70px; z-index: 100; border-top: 1px solid #1a1a1a; }
         .main { margin-left: 260px; padding: 30px; padding-bottom: 100px; }
         @media (max-width: 768px) { .sidebar { display: none; } .mobile-nav { display: grid; grid-template-columns: repeat(5, 1fr); } .main { margin-left: 0; padding: 15px; } }
         .view { display: none; } .view.active { display: block; }
-        .badge { padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; }
+        .status-badge { padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: bold; text-transform: uppercase; }
+        .bg-pend { background: rgba(255, 204, 0, 0.1); color: var(--gold); border: 1px solid var(--gold); }
+        .bg-ok { background: rgba(0, 255, 136, 0.1); color: var(--green); border: 1px solid var(--green); }
+        .bg-fail { background: rgba(255, 68, 68, 0.1); color: var(--red); border: 1px solid var(--red); }
     </style>
 </head>
 <body>
@@ -34,8 +37,13 @@
             <input type="password" id="l-pass" placeholder="CONTRASEÑA" class="input-q">
             <button onclick="login()" class="btn-p">INICIAR SESIÓN</button>
             <div class="flex items-center my-4"><hr class="flex-grow border-gray-800"><span class="px-3 text-[10px] text-gray-600">O ENTRA CON</span><hr class="flex-grow border-gray-800"></div>
-            <div id="g_id_onload" data-client_id="TU_GOOGLE_CLIENT_ID" data-callback="handleGoogleLogin"></div>
+            
+            <div id="g_id_onload" 
+                 data-client_id="599903299957-1u15almgd6dp4bsoq9bcmvk6j4k4loa7.apps.googleusercontent.com" 
+                 data-callback="handleGoogleLogin">
+            </div>
             <div class="g_id_signin" data-type="standard"></div>
+
             <p class="text-[10px] mt-6 text-gray-500">¿No tienes cuenta? <span onclick="toggleAuth(true)" class="text-white underline cursor-pointer">Regístrate</span></p>
         </div>
 
@@ -54,284 +62,241 @@
     <div class="sidebar flex flex-col p-6">
         <div class="neon-text text-sm mb-10 italic">REVIEWPOSITIVE</div>
         <nav class="space-y-2 flex-grow">
-            <div class="nav-btn p-3 cursor-pointer text-sm font-bold text-[#bc13fe]" onclick="nav('v-dash')">🏠 DASHBOARD</div>
-            <div class="nav-btn p-3 cursor-pointer text-sm font-bold text-gray-500" onclick="nav('v-tasks')">📋 TAREAS</div>
-            <div class="nav-btn p-3 cursor-pointer text-sm font-bold text-gray-500" onclick="nav('v-ref')">👥 REFERIDOS</div>
-            <div id="btn-admin-pc" class="nav-btn p-3 cursor-pointer text-sm font-bold text-yellow-500 hidden" onclick="nav('v-admin')">⚡ PANEL ADMIN</div>
+            <div class="nav-btn p-3 cursor-pointer text-sm font-bold" onclick="nav('v-dash', this)">🏠 DASHBOARD</div>
+            <div class="nav-btn p-3 cursor-pointer text-sm font-bold text-gray-500" onclick="nav('v-tasks', this)">📋 TAREAS</div>
+            <div class="nav-btn p-3 cursor-pointer text-sm font-bold text-gray-500" onclick="nav('v-hist', this)">📊 HISTORIAL</div>
+            <div class="nav-btn p-3 cursor-pointer text-sm font-bold text-gray-500" onclick="nav('v-ref', this)">👥 REFERIDOS</div>
+            <div class="nav-btn p-3 cursor-pointer text-sm font-bold text-gray-500" onclick="nav('v-wallet', this)">💰 CAJERO</div>
+            <div id="btn-admin-pc" class="nav-btn p-3 cursor-pointer text-sm font-bold text-yellow-500 hidden" onclick="nav('v-admin', this)">⚡ PANEL ADMIN</div>
         </nav>
         <button onclick="location.reload()" class="text-red-500 text-[10px] font-bold text-left uppercase">Cerrar Sesión</button>
     </div>
 
     <div class="mobile-nav text-[8px] font-bold">
-        <div onclick="nav('v-dash')" class="flex flex-col items-center justify-center text-[#bc13fe]"><span>🏠</span>INICIO</div>
-        <div onclick="nav('v-tasks')" class="flex flex-col items-center justify-center"><span>📋</span>TAREAS</div>
-        <div onclick="nav('v-ref')" class="flex flex-col items-center justify-center"><span>👥</span>REF</div>
-        <div onclick="nav('v-wallet')" class="flex flex-col items-center justify-center"><span>💰</span>CAJERO</div>
-        <div id="btn-admin-mb" class="flex flex-col items-center justify-center text-yellow-500 hidden" onclick="nav('v-admin')"><span>⚡</span>ADMIN</div>
+        <div onclick="nav('v-dash', this)" class="flex flex-col items-center justify-center text-[#bc13fe]"><span>🏠</span>INICIO</div>
+        <div onclick="nav('v-tasks', this)" class="flex flex-col items-center justify-center"><span>📋</span>TAREAS</div>
+        <div onclick="nav('v-hist', this)" class="flex flex-col items-center justify-center"><span>📊</span>HISTORIAL</div>
+        <div onclick="nav('v-wallet', this)" class="flex flex-col items-center justify-center"><span>💰</span>CAJERO</div>
+        <div id="btn-admin-mb" class="flex flex-col items-center justify-center text-yellow-500 hidden" onclick="nav('v-admin', this)"><span>⚡</span>ADMIN</div>
     </div>
 
     <div class="main">
         <div id="v-dash" class="view active">
             <h1 class="text-3xl font-black mb-6 uppercase italic" id="uName">WORKER</h1>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="stat-card glass p-6 border-t-4 border-yellow-500 text-center">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
+                <div class="glass p-6 border-t-4 border-yellow-500">
                     <p class="text-[10px] text-gray-500 mb-2">SALDO DISPONIBLE</p>
                     <div id="saldo" class="text-4xl font-black text-yellow-500">$0.00</div>
                 </div>
-                <div class="stat-card glass p-6 border-t-4 border-[#bc13fe] text-center">
+                <div class="glass p-6 border-t-4 border-[#bc13fe]">
                     <p class="text-[10px] text-gray-500 mb-2">EN REVISIÓN</p>
                     <div id="val-pend" class="text-4xl font-black neon-text">$0.00</div>
                 </div>
             </div>
         </div>
 
-        <div id="v-ref" class="view">
-            <h2 class="text-xl font-black mb-6 italic">SISTEMA DE REFERIDOS</h2>
-            <div class="glass p-6 mb-4">
-                <p class="text-xs text-gray-400 mb-4">Invita amigos. Cuando tu referido complete 10 retiros exitosos, ¡tú recibes <span class="text-green-400 font-bold">$5.00!</span></p>
-                <div class="space-y-4">
-                    <div>
-                        <label class="text-[9px] text-gray-500">TU CÓDIGO</label>
-                        <div id="myRefCode" class="text-lg font-bold text-yellow-500 bg-black/40 p-2 rounded">CÓDIGO</div>
-                    </div>
-                    <div>
-                        <label class="text-[9px] text-gray-500">LINK DE INVITACIÓN</label>
-                        <div id="myRefLink" class="text-[10px] text-blue-400 break-all bg-black/40 p-2 rounded">LINK</div>
-                    </div>
-                </div>
+        <div id="v-tasks" class="view">
+            <h2 class="text-xl font-black mb-6 italic">TAREAS ASIGNADAS</h2>
+            <div id="tasks-list" class="space-y-4"></div>
+        </div>
+
+        <div id="v-hist" class="view">
+            <h2 class="text-xl font-black mb-6 italic">ESTADO DE RESEÑAS</h2>
+            <div class="glass overflow-hidden">
+                <table class="w-full text-left text-[10px]">
+                    <thead class="bg-white/5 uppercase">
+                        <tr><th class="p-3">Tarea</th><th class="p-3">Pago</th><th class="p-3">Estado</th></tr>
+                    </thead>
+                    <tbody id="hist-body"></tbody>
+                </table>
             </div>
         </div>
 
-        <div id="v-tasks" class="view">
-            <h2 class="text-xl font-black mb-6 italic">TAREAS ASIGNADAS</h2>
-            <div id="tasks-list" class="space-y-4">
-                <p class="text-gray-600 text-sm">No tienes tareas asignadas por ahora.</p>
+        <div id="v-ref" class="view">
+            <h2 class="text-xl font-black mb-6 italic">REFERIDOS</h2>
+            <div class="glass p-6 space-y-4">
+                <p class="text-xs text-gray-400">Gana $5.00 cuando tu referido complete 10 retiros.</p>
+                <div>
+                    <label class="text-[9px] text-gray-500 uppercase">Tu Código:</label>
+                    <div id="myRefCode" class="text-lg font-bold text-yellow-500 bg-black/40 p-2 rounded">---</div>
+                </div>
+                <button onclick="copyRef()" class="btn-p !py-2 !text-[9px]">COPIAR LINK DE INVITACIÓN</button>
+            </div>
+        </div>
+
+        <div id="v-wallet" class="view">
+            <h2 class="text-xl font-black mb-6 italic">RETIRAR SALDO</h2>
+            <div class="glass p-6 max-w-[400px] mx-auto space-y-4 text-center">
+                <select id="w-method" class="input-q"><option>Binance Pay (ID)</option><option>Bybit Pay</option><option>Zinli</option><option>Pago Móvil (VZ)</option></select>
+                <input type="text" id="w-data" placeholder="Correo / ID / Datos Pago" class="input-q">
+                <input type="number" id="w-amount" placeholder="Monto (Min $5)" class="input-q">
+                <button onclick="solicitarRetiro()" class="btn-p">SOLICITAR COBRO</button>
             </div>
         </div>
 
         <div id="v-admin" class="view">
-            <h2 class="text-2xl font-black mb-6 text-yellow-500 italic">MASTER CONTROL PANEL</h2>
-            
-            <div class="flex gap-2 mb-6 overflow-x-auto">
-                <button onclick="admTab('adm-tasks')" class="bg-gray-800 p-2 rounded text-[10px] font-bold">ASIGNAR TAREA</button>
-                <button onclick="admTab('adm-reviews')" class="bg-gray-800 p-2 rounded text-[10px] font-bold">REVISAR RESEÑAS</button>
-                <button onclick="admTab('adm-users')" class="bg-gray-800 p-2 rounded text-[10px] font-bold">GESTIONAR USERS</button>
-                <button onclick="admTab('adm-withdraws')" class="bg-gray-800 p-2 rounded text-[10px] font-bold">RETIROS</button>
+            <h2 class="text-2xl font-black mb-6 text-yellow-500 italic uppercase">Master Control</h2>
+            <div class="flex gap-2 mb-6 overflow-x-auto pb-2">
+                <button onclick="admTab('a-tasks')" class="bg-gray-800 p-2 rounded text-[10px] font-bold shrink-0">CREAR TAREA</button>
+                <button onclick="admTab('a-revs')" class="bg-gray-800 p-2 rounded text-[10px] font-bold shrink-0">REVISAR RESEÑAS</button>
+                <button onclick="admTab('a-users')" class="bg-gray-800 p-2 rounded text-[10px] font-bold shrink-0">USUARIOS</button>
+                <button onclick="admTab('a-withs')" class="bg-gray-800 p-2 rounded text-[10px] font-bold shrink-0">RETIROS</button>
             </div>
 
-            <div id="adm-tasks" class="adm-subview">
-                <div class="glass p-6 space-y-3">
-                    <input type="text" id="adm-t-title" placeholder="Título (Ej: Google Maps)" class="input-q">
-                    <input type="text" id="adm-t-link" placeholder="Enlace del Negocio" class="input-q">
-                    <textarea id="adm-t-text" placeholder="Texto sugerido para la reseña" class="input-q h-20"></textarea>
-                    <input type="number" id="adm-t-pay" placeholder="Pago (Ej: 0.80)" class="input-q">
-                    <button onclick="adminAsignarTarea()" class="btn-p">LANZAR TAREA A TODOS</button>
-                </div>
+            <div id="a-tasks" class="adm-subview glass p-6 space-y-3">
+                <input type="text" id="adm-t-title" placeholder="Título" class="input-q">
+                <input type="text" id="adm-t-link" placeholder="Link Negocio" class="input-q">
+                <textarea id="adm-t-text" placeholder="Instrucciones" class="input-q h-20"></textarea>
+                <input type="number" id="adm-t-pay" placeholder="Pago (Ej: 0.80)" class="input-q">
+                <input type="text" id="adm-t-target" placeholder="Apodo (Vacío = TODOS)" class="input-q">
+                <button onclick="adminAsignarTarea()" class="btn-p">LANZAR TAREA</button>
             </div>
 
-            <div id="adm-reviews" class="adm-subview hidden">
-                <div id="admin-reviews-list" class="space-y-2"></div>
-            </div>
-
-            <div id="adm-users" class="adm-subview hidden">
-                <div id="admin-users-list" class="space-y-2"></div>
-            </div>
+            <div id="a-revs" class="adm-subview hidden space-y-2"></div>
+            <div id="a-users" class="adm-subview hidden space-y-2"></div>
+            <div id="a-withs" class="adm-subview hidden space-y-2"></div>
         </div>
     </div>
 </div>
 
 <script>
-    // --- DATABASE MOCK (Esto se conectaría a Firebase/Supabase) ---
-    let db = JSON.parse(localStorage.getItem('rp_database')) || {
-        users: [],
-        tasks: [],
-        reviews: [],
-        withdraws: []
-    };
+    let db = JSON.parse(localStorage.getItem('rp_db_v4k')) || { users: [], tasks: [], reviews: [], withdraws: [] };
+    function save() { localStorage.setItem('rp_db_v4k', JSON.stringify(db)); }
 
     let currentUser = null;
-    const MASTER_EMAIL = "nevinarg.2023@gmail.com";
+    const MASTER = "nevinarg.2023@gmail.com";
 
-    function saveDB() { localStorage.setItem('rp_database', JSON.stringify(db)); }
+    // --- LOGIN ---
+    function handleGoogleLogin(res) {
+        const d = parseJwt(res.credential);
+        let u = db.users.find(x => x.email === d.email);
+        if(!u) {
+            u = { nick: d.given_name, email: d.email, pass: "google", saldo: 0, pending: 0, banned: false, refCode: d.given_name+Math.floor(Math.random()*999), referredBy: null, withCount: 0 };
+            db.users.push(u); save();
+        }
+        if(u.banned) return alert("BANEADO");
+        currentUser = u; launch();
+    }
 
-    // --- AUTENTICACIÓN ---
     function login() {
         const e = document.getElementById('l-email').value;
         const p = document.getElementById('l-pass').value;
-        const user = db.users.find(u => u.email === e);
-
-        if (!user) return alert("CORREO INCORRECTO");
-        if (user.pass !== p) return alert("CLAVE INCORRECTA");
-        if (user.banned) return alert("TU CUENTA HA SIDO BANEADA POR ACTIVIDAD INUSUAL");
-
-        currentUser = user;
-        launchApp();
+        const u = db.users.find(x => x.email === e);
+        if(!u || u.pass !== p) return alert("ERROR DE DATOS");
+        if(u.banned) return alert("BANEADO");
+        currentUser = u; launch();
     }
 
     function register() {
-        const nick = document.getElementById('r-nick').value;
-        const email = document.getElementById('r-email').value;
-        const pass = document.getElementById('r-pass').value;
-        const refCode = document.getElementById('r-ref').value;
-
-        if(!nick || !email || !pass) return alert("Faltan datos");
-        if(db.users.find(u => u.email === email)) return alert("El correo ya existe");
-
-        const newUser = {
-            nick, email, pass, 
-            saldo: 0, 
-            pending: 0, 
-            banned: false,
-            refCode: nick + Math.floor(Math.random()*99),
-            referredBy: refCode || null,
-            withdrawCount: 0
-        };
-
-        db.users.push(newUser);
-        saveDB();
-        alert("Cuenta creada. Ya puedes iniciar sesión.");
-        toggleAuth(false);
+        const n = document.getElementById('r-nick').value;
+        const e = document.getElementById('r-email').value;
+        const p = document.getElementById('r-pass').value;
+        const r = document.getElementById('r-ref').value;
+        if(db.users.find(x => x.email === e)) return alert("YA EXISTE");
+        db.users.push({ nick: n, email: e, pass: p, saldo: 0, pending: 0, banned: false, refCode: n+Math.floor(Math.random()*99), referredBy: r, withCount: 0 });
+        save(); alert("LISTO"); toggleAuth(false);
     }
 
-    function launchApp() {
+    function launch() {
         document.getElementById('auth-gate').classList.add('hidden');
         document.getElementById('app-panel').classList.remove('hidden');
         document.getElementById('uName').innerText = currentUser.nick;
         document.getElementById('myRefCode').innerText = currentUser.refCode;
-        document.getElementById('myRefLink').innerText = window.location.href.split('?')[0] + "?ref=" + currentUser.refCode;
-
-        // Mostrar Admin si es el correo master
-        if(currentUser.email === MASTER_EMAIL) {
+        if(currentUser.email === MASTER) {
             document.getElementById('btn-admin-pc').classList.remove('hidden');
             document.getElementById('btn-admin-mb').classList.remove('hidden');
             renderAdmin();
         }
         updateUI();
-        renderTasks();
-    }
-
-    // --- TAREAS Y REVISIÓN ---
-    function renderTasks() {
-        const cont = document.getElementById('tasks-list');
-        cont.innerHTML = "";
-        db.tasks.forEach((t, i) => {
-            const div = document.createElement('div');
-            div.className = "glass p-4 border-l-4 border-purple-500";
-            div.innerHTML = `
-                <div class="flex justify-between items-start mb-2">
-                    <p class="font-bold">${t.title}</p>
-                    <span class="text-yellow-500 font-bold">$${t.pay}</span>
-                </div>
-                <p class="text-[10px] text-gray-500 mb-3">${t.text || 'Sin instrucciones adicionales'}</p>
-                <div class="flex gap-2">
-                    <a href="${t.link}" target="_blank" class="bg-white/10 p-2 rounded text-[10px] uppercase font-bold">Ver Negocio</a>
-                    <input type="text" id="url-${i}" placeholder="URL de tu reseña" class="input-q !p-1 text-xs">
-                    <button onclick="enviarResena(${i})" class="btn-p !w-20 !p-1">SUBIR</button>
-                </div>
-            `;
-            cont.appendChild(div);
-        });
-    }
-
-    function enviarResena(taskIdx) {
-        const url = document.getElementById(`url-${taskIdx}`).value;
-        if(!url) return alert("Pega el link");
-        
-        db.reviews.push({
-            user: currentUser.email,
-            taskIdx: taskIdx,
-            url: url,
-            pay: db.tasks[taskIdx].pay,
-            status: 'pendiente'
-        });
-        currentUser.pending += db.tasks[taskIdx].pay;
-        saveDB();
-        updateUI();
-        alert("Enviada a revisión.");
-    }
-
-    // --- PANEL ADMIN LOGIC ---
-    function adminAsignarTarea() {
-        const title = document.getElementById('adm-t-title').value;
-        const link = document.getElementById('adm-t-link').value;
-        const text = document.getElementById('adm-t-text').value;
-        const pay = parseFloat(document.getElementById('adm-t-pay').value);
-
-        db.tasks.push({ title, link, text, pay });
-        saveDB();
-        alert("Tarea lanzada");
-        renderTasks();
-    }
-
-    function renderAdmin() {
-        // Renderizar Usuarios para banear/ver
-        const userList = document.getElementById('admin-users-list');
-        userList.innerHTML = db.users.map(u => `
-            <div class="glass p-3 flex justify-between items-center">
-                <span class="text-[10px]">${u.nick} (${u.email})</span>
-                <button onclick="banUser('${u.email}')" class="bg-red-900 text-[8px] p-1 rounded">${u.banned ? 'UNBAN' : 'BAN'}</button>
-            </div>
-        `).join('');
-
-        // Renderizar Reseñas para aprobar
-        const revList = document.getElementById('admin-reviews-list');
-        revList.innerHTML = db.reviews.filter(r => r.status === 'pendiente').map((r, i) => `
-            <div class="glass p-3">
-                <p class="text-[10px] mb-2">Usuario: ${r.user} - Pago: $${r.pay}</p>
-                <a href="${r.url}" target="_blank" class="text-blue-400 text-[10px] underline">VER RESEÑA</a>
-                <div class="flex gap-2 mt-2">
-                    <button onclick="decideReview(${i}, 'ok')" class="bg-green-600 text-[8px] p-1 rounded font-bold">APROBAR</button>
-                    <button onclick="decideReview(${i}, 'fail')" class="bg-red-600 text-[8px] p-1 rounded font-bold">RECHAZAR</button>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    function decideReview(idx, status) {
-        const rev = db.reviews[idx];
-        const user = db.users.find(u => u.email === rev.user);
-        
-        if(status === 'ok') {
-            user.saldo += rev.pay;
-            user.pending -= rev.pay;
-        } else {
-            user.pending -= rev.pay;
-        }
-        
-        rev.status = status;
-        saveDB();
-        renderAdmin();
-        updateUI();
-    }
-
-    function banUser(email) {
-        const user = db.users.find(u => u.email === email);
-        user.banned = !user.banned;
-        saveDB();
-        renderAdmin();
-    }
-
-    // --- UTILIDADES ---
-    function toggleAuth(reg) {
-        document.getElementById('login-box').classList.toggle('hidden', reg);
-        document.getElementById('reg-box').classList.toggle('hidden', !reg);
-    }
-
-    function nav(v) {
-        document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
-        document.getElementById(v).classList.add('active');
-    }
-
-    function admTab(v) {
-        document.querySelectorAll('.adm-subview').forEach(x => x.classList.add('hidden'));
-        document.getElementById(v).classList.remove('hidden');
     }
 
     function updateUI() {
-        if(!currentUser) return;
-        document.getElementById('saldo').innerText = "$" + currentUser.saldo.toFixed(2);
-        document.getElementById('val-pend').innerText = "$" + currentUser.pending.toFixed(2);
+        document.getElementById('saldo').innerText = `$${currentUser.saldo.toFixed(2)}`;
+        document.getElementById('val-pend').innerText = `$${currentUser.pending.toFixed(2)}`;
+        
+        // Tareas
+        const list = document.getElementById('tasks-list');
+        list.innerHTML = "";
+        db.tasks.filter(t => !t.target || t.target === currentUser.nick).forEach(t => {
+            if(!db.reviews.find(r => r.taskId === t.id && r.user === currentUser.email)) {
+                list.innerHTML += `<div class="glass p-4 border-l-4 border-purple-500">
+                    <div class="flex justify-between font-bold"><span>${t.title}</span><span class="text-yellow-500">$${t.pay}</span></div>
+                    <p class="text-[10px] text-gray-500 my-2">${t.text}</p>
+                    <div class="flex gap-2">
+                        <a href="${t.link}" target="_blank" class="bg-white/10 p-2 rounded text-[10px] font-bold">LINK</a>
+                        <input type="text" id="url-${t.id}" placeholder="Link reseña" class="input-q !p-1 text-xs">
+                        <button onclick="enviarResena('${t.id}', ${t.pay})" class="btn-p !w-20 !p-1">SUBIR</button>
+                    </div></div>`;
+            }
+        });
+
+        // Historial Trabajador
+        document.getElementById('hist-body').innerHTML = db.reviews.filter(r => r.user === currentUser.email).reverse().map(r => `
+            <tr class="border-b border-white/5"><td class="p-3">${r.title}</td><td class="p-3">$${r.pay}</td><td class="p-3"><span class="status-badge bg-${r.status === 'aprobado' ? 'ok' : r.status === 'rechazado' ? 'fail' : 'pend'}">${r.status}</span></td></tr>
+        `).join('');
     }
+
+    function enviarResena(tid, pay) {
+        const url = document.getElementById(`url-${tid}`).value;
+        if(!url) return alert("Pega el link");
+        db.reviews.push({ id: Date.now(), taskId: tid, title: db.tasks.find(x => x.id === tid).title, user: currentUser.email, nick: currentUser.nick, url: url, pay: pay, status: 'pendiente' });
+        currentUser.pending += pay;
+        save(); updateUI(); alert("ENVIADA");
+    }
+
+    // --- ADMIN ---
+    function adminAsignarTarea() {
+        const t = { id: 'T'+Date.now(), title: document.getElementById('adm-t-title').value, link: document.getElementById('adm-t-link').value, text: document.getElementById('adm-t-text').value, pay: parseFloat(document.getElementById('adm-t-pay').value), target: document.getElementById('adm-t-target').value || null };
+        db.tasks.push(t); save(); alert("LANZADA"); updateUI(); renderAdmin();
+    }
+
+    function renderAdmin() {
+        // Revision Reseñas
+        document.getElementById('a-revs').innerHTML = db.reviews.filter(r => r.status === 'pendiente').map(r => `
+            <div class="glass p-3 flex justify-between items-center text-[10px]">
+                <div><b>${r.nick}</b> ($${r.pay})<br><a href="${r.url}" target="_blank" class="text-blue-400">VER LINK</a></div>
+                <div class="flex gap-1"><button onclick="decidir('${r.id}', 'aprobado')" class="bg-green-600 p-2 rounded">OK</button><button onclick="decidir('${r.id}', 'rechazado')" class="bg-red-600 p-2 rounded">X</button></div>
+            </div>`).join('');
+        // Usuarios
+        document.getElementById('a-users').innerHTML = db.users.map(u => `
+            <div class="glass p-3 flex justify-between items-center text-[10px]"><span>${u.nick} ($${u.saldo})</span><button onclick="ban('${u.email}')" class="bg-red-900 p-1 rounded">BAN/UNBAN</button></div>`).join('');
+        // Retiros
+        document.getElementById('a-withs').innerHTML = db.withdraws.filter(w => w.status === 'pendiente').map(w => `
+            <div class="glass p-3 flex justify-between items-center text-[10px]"><div><b>${w.nick}</b> ($${w.amount})<br>${w.method}: ${w.data}</div><button onclick="pagar('${w.id}')" class="bg-yellow-600 p-1 rounded">PAGADO</button></div>`).join('');
+    }
+
+    function decidir(rid, stat) {
+        const r = db.reviews.find(x => x.id == rid);
+        const u = db.users.find(x => x.email === r.user);
+        if(stat === 'aprobado') { u.saldo += r.pay; u.pending -= r.pay; } else { u.pending -= r.pay; }
+        r.status = stat; save(); renderAdmin(); updateUI();
+    }
+
+    function pagar(wid) {
+        const w = db.withdraws.find(x => x.id == wid);
+        const u = db.users.find(x => x.email === w.email);
+        w.status = 'pagado'; u.withCount++;
+        if(u.referredBy) {
+            const boss = db.users.find(x => x.refCode === u.referredBy);
+            if(boss && u.withCount === 10) boss.saldo += 5;
+        }
+        save(); renderAdmin();
+    }
+
+    function solicitarRetiro() {
+        const a = parseFloat(document.getElementById('w-amount').value);
+        if(a < 5 || a > currentUser.saldo) return alert("MONTO INVÁLIDO");
+        db.withdraws.push({ id: Date.now(), email: currentUser.email, nick: currentUser.nick, amount: a, method: document.getElementById('w-method').value, data: document.getElementById('w-data').value, status: 'pendiente' });
+        currentUser.saldo -= a; save(); updateUI(); alert("SOLICITADO");
+    }
+
+    // --- UTILS ---
+    function parseJwt(t) { var b64 = t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'); return JSON.parse(decodeURIComponent(atob(b64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''))); }
+    function toggleAuth(reg) { document.getElementById('login-box').classList.toggle('hidden', reg); document.getElementById('reg-box').classList.toggle('hidden', !reg); }
+    function nav(v, el) { document.querySelectorAll('.view').forEach(x => x.classList.remove('active')); document.getElementById(v).classList.add('active'); if(el) { document.querySelectorAll('.nav-btn').forEach(x => x.classList.add('text-gray-500')); el.classList.remove('text-gray-500'); el.classList.add('text-[#bc13fe]'); } }
+    function admTab(v) { document.querySelectorAll('.adm-subview').forEach(x => x.classList.add('hidden')); document.getElementById(v).classList.remove('hidden'); }
+    function copyRef() { navigator.clipboard.writeText(window.location.href + "?ref=" + currentUser.refCode); alert("LINK COPIADO"); }
+    function ban(e) { const u = db.users.find(x => x.email === e); u.banned = !u.banned; save(); renderAdmin(); }
 </script>
 </body>
 </html>
