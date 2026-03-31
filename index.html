@@ -47,9 +47,12 @@
         
         .view { display: none; } .view.active { display: block; }
         .status-pill { padding: 4px 8px; border-radius: 4px; font-size: 9px; font-weight: bold; text-transform: uppercase; }
-        .status-pendiente { background: #555; }
+        .status-pendiente { background: #555; color: white; }
         .status-aprobado { background: #00ff88; color: #000; }
         .status-rechazado { background: #ff4444; color: #fff; }
+
+        /* Estilo para el Cajero */
+        .wallet-card { background: linear-gradient(180deg, rgba(188, 19, 254, 0.1) 0%, rgba(0,0,0,0) 100%); border: 1px solid rgba(188, 19, 254, 0.3); }
     </style>
 </head>
 <body>
@@ -106,7 +109,8 @@
     <main class="main">
         <div id="v-dash" class="view active">
             <h1 class="text-3xl font-black mb-1 uppercase italic text-white" id="u-nick">...</h1>
-            <p class="text-xs text-yellow-500 mb-8 font-bold">TU CÓDIGO REF: <span id="u-ref-code" class="text-white select-all">---</span></p>
+            <p class="text-xs text-yellow-500 mb-8 font-bold italic">CÓDIGO DE REFERIDO: <span id="u-ref-code" class="text-white select-all bg-white/10 px-2 py-1 rounded">---</span></p>
+            
             <div class="glass p-8 max-w-sm border-t-4 border-purple-600 shadow-2xl relative overflow-hidden">
                 <div class="absolute -right-10 -top-10 bg-purple-600/20 w-32 h-32 rounded-full blur-2xl"></div>
                 <p class="text-[10px] uppercase font-bold text-gray-400 mb-2 tracking-wider">Saldo Disponible</p>
@@ -118,56 +122,60 @@
             <h2 class="font-black mb-6 italic text-xl uppercase text-white border-b border-gray-800 pb-2">TAREAS ACTIVAS</h2>
             <div id="tasks-list" class="space-y-4 mb-10"></div>
             
-            <h2 class="font-black mb-4 italic text-sm text-gray-500 uppercase mt-10">Mi Historial de Reseñas</h2>
-            <div id="my-reviews" class="space-y-2 text-[11px]"></div>
+            <h2 class="font-black mb-4 italic text-sm text-gray-500 uppercase mt-10">Historial de mis Reseñas</h2>
+            <div id="my-reviews" class="grid grid-cols-1 gap-2"></div>
         </div>
 
         <div id="v-wallet" class="view">
             <h2 class="font-black mb-6 italic text-xl uppercase text-white border-b border-gray-800 pb-2">CAJERO</h2>
-            <div class="glass p-6 max-w-md space-y-4">
-                <p class="text-xs text-gray-400 mb-4">Solicita tu retiro. El saldo se descontará al instante.</p>
-                
-                <label class="text-[10px] font-bold text-purple-400 uppercase">Método de Pago</label>
-                <select id="w-method" class="input-q">
-                    <option value="Binance Pay">Binance Pay</option>
-                    <option value="Bybit Pay">Bybit Pay</option>
-                    <option value="Zelle">Zelle</option>
-                    <option value="Pago Movil">Pago Móvil</option>
-                </select>
+            <div class="wallet-card p-6 max-w-md rounded-xl space-y-4">
+                <div>
+                    <label class="text-[10px] font-bold text-purple-400 uppercase">Monto a retirar ($)</label>
+                    <input type="number" id="w-amount" placeholder="0.00" class="input-q text-xl font-bold">
+                </div>
 
-                <label class="text-[10px] font-bold text-purple-400 uppercase">Datos de la cuenta</label>
-                <input type="text" id="w-address" placeholder="Ej: Correo Zelle, ID Binance, CI y Telf..." class="input-q">
+                <div>
+                    <label class="text-[10px] font-bold text-purple-400 uppercase">Método de Pago</label>
+                    <select id="w-method" class="input-q">
+                        <option value="Binance Pay">Binance Pay</option>
+                        <option value="Bybit Pay">Bybit Pay</option>
+                        <option value="Zelle">Zelle</option>
+                        <option value="Pago Movil">Pago Móvil</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="text-[10px] font-bold text-purple-400 uppercase">Datos de la cuenta</label>
+                    <input type="text" id="w-address" placeholder="ID, Correo o Teléfono" class="input-q">
+                </div>
                 
-                <label class="text-[10px] font-bold text-purple-400 uppercase">Monto a retirar ($)</label>
-                <input type="number" id="w-amount" placeholder="0.00" class="input-q">
-                
-                <button onclick="requestWithdraw()" class="btn-p mt-4">ENVIAR SOLICITUD</button>
+                <button onclick="requestWithdraw()" class="btn-p mt-4 shadow-lg shadow-purple-500/20">RETIRAR SALDO</button>
             </div>
             
-            <h2 class="font-black mb-4 italic text-sm text-gray-500 uppercase mt-10">Mis Retiros</h2>
-            <div id="my-withdraws" class="space-y-2 text-[11px]"></div>
+            <h2 class="font-black mb-4 italic text-sm text-gray-500 uppercase mt-10">Mis Solicitudes de Retiro</h2>
+            <div id="my-withdraws" class="space-y-2"></div>
         </div>
 
         <div id="v-admin" class="view">
-            <h2 class="text-yellow-500 font-black mb-6 italic text-2xl uppercase text-shadow-md">Panel de Control Múltiple</h2>
+            <h2 class="text-yellow-500 font-black mb-6 italic text-2xl uppercase text-shadow-md">Panel Admin Master</h2>
             
             <div class="flex gap-2 mb-6 text-[10px] font-black overflow-x-auto pb-2">
-                <button onclick="admS('a-newtask')" class="bg-purple-600 px-4 py-2 rounded text-white whitespace-nowrap">NUEVA TAREA</button>
-                <button onclick="admS('a-u')" class="bg-gray-800 px-4 py-2 rounded text-white whitespace-nowrap hover:bg-gray-700">USUARIOS</button>
-                <button onclick="admS('a-r')" class="bg-gray-800 px-4 py-2 rounded text-white whitespace-nowrap hover:bg-gray-700">RESEÑAS <span id="badge-resenas" class="bg-red-500 px-1 rounded ml-1 hidden">0</span></button>
-                <button onclick="admS('a-w')" class="bg-gray-800 px-4 py-2 rounded text-white whitespace-nowrap hover:bg-gray-700">PAGOS <span id="badge-pagos" class="bg-red-500 px-1 rounded ml-1 hidden">0</span></button>
+                <button onclick="admS('a-newtask')" class="bg-purple-600 px-4 py-2 rounded text-white whitespace-nowrap">CREAR TAREA</button>
+                <button onclick="admS('a-u')" class="bg-gray-800 px-4 py-2 rounded text-white whitespace-nowrap">USUARIOS/BAN</button>
+                <button onclick="admS('a-r')" class="bg-gray-800 px-4 py-2 rounded text-white whitespace-nowrap">REVISAR RESEÑAS <span id="badge-resenas" class="bg-red-500 px-1 rounded ml-1 hidden">0</span></button>
+                <button onclick="admS('a-w')" class="bg-gray-800 px-4 py-2 rounded text-white whitespace-nowrap">PAGAR RETIROS <span id="badge-pagos" class="bg-red-500 px-1 rounded ml-1 hidden">0</span></button>
             </div>
 
             <div id="a-newtask" class="adm-sec">
                 <div class="glass p-6 max-w-lg space-y-4">
                     <input type="text" id="adm-t-name" placeholder="Nombre del Negocio" class="input-q">
                     <input type="text" id="adm-t-link" placeholder="Link de Google Maps" class="input-q">
-                    <input type="number" id="adm-t-pay" placeholder="Pago por reseña (Ej: 0.50)" class="input-q">
+                    <input type="number" id="adm-t-pay" placeholder="Pago ($)" class="input-q">
                     <select id="adm-t-target" class="input-q" onchange="toggleSpecificEmail()">
-                        <option value="all">Para TODOS los reseñadores</option>
-                        <option value="specific">Para UN correo específico</option>
+                        <option value="all">Público para todos</option>
+                        <option value="specific">Privada para un correo</option>
                     </select>
-                    <input type="email" id="adm-t-email" placeholder="Correo del reseñador específico" class="input-q hidden">
+                    <input type="email" id="adm-t-email" placeholder="Correo del trabajador" class="input-q hidden">
                     <button onclick="createTask()" class="btn-p">PUBLICAR TAREA</button>
                 </div>
             </div>
@@ -180,9 +188,6 @@
 </div>
 
 <script>
-    // ---------------------------------------------
-    // CONEXIÓN A FIREBASE REAL 
-    // ---------------------------------------------
     const firebaseConfig = {
       apiKey: "AIzaSyCl70qqZqSbS3Yb9LAmfysj4U8GrlWnBI0",
       authDomain: "rese-7c285.firebaseapp.com",
@@ -200,7 +205,6 @@
     let userData = null;
     let unsubUser = null;
 
-    // Sistema de Alertas
     function msg(t, ok=false) {
         const e = document.getElementById('alert-msg');
         e.innerText = t; e.style.background = ok ? '#00ff88' : '#ff4444';
@@ -209,18 +213,13 @@
         setTimeout(()=>e.classList.add('hidden'), 3500);
     }
 
-    // ---------------------------------------------
-    // SISTEMA DE AUTENTICACIÓN
-    // ---------------------------------------------
     auth.onAuthStateChanged(user => {
         if(user) {
-            // Escuchar cambios del usuario en tiempo real (Saldo, Ban, etc)
             unsubUser = db.collection('usuarios').doc(user.email).onSnapshot(doc => {
                 if(!doc.exists) return;
                 userData = doc.data();
-                
                 if(userData.banned) {
-                    msg("TU CUENTA HA SIDO SUSPENDIDA");
+                    msg("TU CUENTA ESTÁ BANEADA");
                     auth.signOut();
                     return;
                 }
@@ -243,9 +242,7 @@
         const e = document.getElementById('r-email').value.trim().toLowerCase();
         const p = document.getElementById('r-pass').value;
         const r = document.getElementById('r-ref').value.trim();
-
-        if(!n || !e || !p) return msg("Llena todos los campos");
-
+        if(!n || !e || !p) return msg("Faltan datos");
         try {
             await auth.createUserWithEmailAndPassword(e, p);
             await db.collection('usuarios').doc(e).set({
@@ -254,16 +251,13 @@
                 referredBy: r || null, banned: false,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
-            msg("¡Cuenta creada!", true);
         } catch(err) { msg(err.message); }
     }
 
     async function loginEmail() {
         const e = document.getElementById('l-email').value.trim();
         const p = document.getElementById('l-pass').value;
-        if(!e || !p) return msg("Ingresa datos");
-        try { await auth.signInWithEmailAndPassword(e, p); } 
-        catch(err) { msg("Credenciales incorrectas"); }
+        try { await auth.signInWithEmailAndPassword(e, p); } catch(err) { msg("Error al entrar"); }
     }
 
     async function loginGoogle() {
@@ -271,8 +265,6 @@
         try {
             const res = await auth.signInWithPopup(provider);
             const user = res.user;
-            
-            // Verificar si existe en DB, si no, lo creamos
             const doc = await db.collection('usuarios').doc(user.email).get();
             if(!doc.exists) {
                 await db.collection('usuarios').doc(user.email).set({
@@ -282,30 +274,24 @@
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
             }
-        } catch(err) { msg("Error con Google"); }
+        } catch(err) { msg("Error Google"); }
     }
 
     function logout() { auth.signOut(); }
 
-    // ---------------------------------------------
-    // MOTOR PRINCIPAL DE LA APP
-    // ---------------------------------------------
     function launchApp() {
         document.getElementById('auth-gate').classList.add('hidden');
         document.getElementById('app-panel').classList.remove('hidden');
-        
         document.getElementById('u-nick').innerText = userData.nick;
         document.getElementById('u-saldo').innerText = `$${userData.saldo.toFixed(2)}`;
         document.getElementById('u-ref-code').innerText = userData.refCode;
 
-        // Activar privilegios de Admin Master
         if(userData.email === MASTER_EMAIL) {
             document.getElementById('adm-btn').classList.remove('hidden');
             document.getElementById('adm-btn-mb').classList.remove('hidden');
             document.getElementById('mb-nav').classList.add('admin-active');
             listenAdminData();
         }
-        
         listenTasks();
         listenMyReviews();
         listenMyWithdraws();
@@ -314,58 +300,45 @@
     function nav(v) {
         document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
         document.getElementById(v).classList.add('active');
-        // Efecto visual menú móvil
         document.querySelectorAll('.nav-item-m').forEach(x => x.classList.remove('active'));
-        if(event && event.currentTarget.classList.contains('nav-item-m')){
-            event.currentTarget.classList.add('active');
-        }
+        if(event && event.currentTarget.classList.contains('nav-item-m')) event.currentTarget.classList.add('active');
     }
 
-    // ---------------------------------------------
-    // TAREAS Y RESEÑAS (RESEÑADORES)
-    // ---------------------------------------------
     function listenTasks() {
         db.collection('tareas').where('active', '==', true).onSnapshot(snap => {
             const cont = document.getElementById('tasks-list');
             cont.innerHTML = "";
-            let count = 0;
             snap.forEach(doc => {
                 const t = doc.data();
-                // Filtrar: Si es para todos, o si es específicamente para este correo
                 if(t.target === 'all' || t.target === userData.email) {
-                    count++;
                     cont.innerHTML += `
-                        <div class="glass p-5 border-l-4 border-purple-500 hover:border-purple-400 transition" id="taskbox-${doc.id}">
-                            <div class="flex justify-between font-black text-sm uppercase italic mb-1">
+                        <div class="glass p-4 border-l-4 border-purple-500" id="taskbox-${doc.id}">
+                            <div class="flex justify-between font-black text-sm uppercase italic mb-2">
                                 <span class="text-white">${t.name}</span>
-                                <span class="text-green-400 text-lg">$${t.pay.toFixed(2)}</span>
+                                <span class="text-green-400">$${t.pay.toFixed(2)}</span>
                             </div>
-                            <p class="text-[10px] text-gray-500 mb-3">${t.target !== 'all' ? '🎯 Tarea Exclusiva para ti' : 'Pública'}</p>
-                            <div class="flex flex-col md:flex-row gap-2">
-                                <a href="${t.link}" target="_blank" class="bg-blue-600 hover:bg-blue-500 text-white p-3 rounded text-[10px] font-bold text-center">1. ABRIR GOOGLE MAPS</a>
-                                <input id="link-${doc.id}" placeholder="2. Pega aquí el link de tu reseña ya publicada" class="input-q !p-2 flex-grow text-[11px]">
-                                <button onclick="submitReview('${doc.id}', '${t.name}', ${t.pay})" class="bg-purple-600 hover:bg-purple-500 px-6 rounded text-[10px] font-bold py-2 md:py-0">3. ENVIAR</button>
+                            <div class="flex flex-col gap-2">
+                                <a href="${t.link}" target="_blank" class="bg-blue-600 text-white p-2 rounded text-[10px] text-center font-bold">1. ABRIR MAPS</a>
+                                <input id="link-${doc.id}" placeholder="2. Pega aquí el link de tu reseña" class="input-q !p-2 text-[11px]">
+                                <button onclick="submitReview('${doc.id}', '${t.name}', ${t.pay})" class="btn-p !p-2 text-[10px]">3. ENVIAR REVISIÓN</button>
                             </div>
                         </div>`;
                 }
             });
-            if(count === 0) cont.innerHTML = '<p class="text-xs text-gray-500 italic">No hay tareas disponibles por ahora.</p>';
         });
     }
 
     async function submitReview(tid, tname, tpay) {
         const url = document.getElementById(`link-${tid}`).value.trim();
-        if(!url) return msg("Debes pegar el link de comprobante");
-        
+        if(!url) return msg("Pega el link");
         await db.collection('resenas').add({
             userId: userData.email, userNick: userData.nick,
             taskId: tid, taskName: tname, pay: tpay,
             url: url, status: 'pendiente', 
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-        
-        msg("Reseña enviada a revisión", true);
-        document.getElementById(`taskbox-${tid}`).style.display = 'none'; // Ocultar localmente
+        msg("Enviada!", true);
+        document.getElementById(`taskbox-${tid}`).remove();
     }
 
     function listenMyReviews() {
@@ -375,17 +348,20 @@
             snap.forEach(doc => {
                 const r = doc.data();
                 cont.innerHTML += `
-                    <div class="bg-white/5 p-3 rounded flex justify-between items-center border border-white/10">
-                        <span class="text-white">${r.taskName} <span class="text-green-400 font-bold ml-2">+$${r.pay}</span></span>
-                        <span class="status-pill status-${r.status}">${r.status}</span>
+                    <div class="bg-white/5 p-3 rounded-lg border border-white/10 flex justify-between items-center text-[10px]">
+                        <div>
+                            <p class="text-white font-bold">${r.taskName}</p>
+                            <p class="text-gray-500">${r.createdAt ? r.createdAt.toDate().toLocaleDateString() : ''}</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="text-green-400 font-bold">$${r.pay.toFixed(2)}</span>
+                            <span class="status-pill status-${r.status}">${r.status}</span>
+                        </div>
                     </div>`;
             });
         });
     }
 
-    // ---------------------------------------------
-    // CAJERO (RETIROS)
-    // ---------------------------------------------
     function listenMyWithdraws() {
         db.collection('retiros').where('userId', '==', userData.email).orderBy('createdAt', 'desc').onSnapshot(snap => {
             const cont = document.getElementById('my-withdraws');
@@ -393,8 +369,8 @@
             snap.forEach(doc => {
                 const w = doc.data();
                 cont.innerHTML += `
-                    <div class="bg-white/5 p-3 rounded flex justify-between items-center border border-white/10">
-                        <div><span class="text-white font-bold">$${w.amount.toFixed(2)}</span> vía ${w.method}</div>
+                    <div class="bg-white/5 p-3 rounded-lg border border-white/10 flex justify-between items-center text-[10px]">
+                        <div><b class="text-white">$${w.amount.toFixed(2)}</b> <span class="text-gray-400">vía ${w.method}</span></div>
                         <span class="status-pill status-${w.status}">${w.status}</span>
                     </div>`;
             });
@@ -402,206 +378,129 @@
     }
 
     async function requestWithdraw() {
-        const method = document.getElementById('w-method').value;
-        const address = document.getElementById('w-address').value.trim();
-        const amount = parseFloat(document.getElementById('w-amount').value);
+        const m = document.getElementById('w-method').value;
+        const a = document.getElementById('w-address').value.trim();
+        const am = parseFloat(document.getElementById('w-amount').value);
+        if(!a || isNaN(am) || am <= 0) return msg("Datos inválidos");
+        if(userData.saldo < am) return msg("Saldo insuficiente");
 
-        if(!address || !amount || amount <= 0) return msg("Datos inválidos");
-        if(userData.saldo < amount) return msg("Saldo insuficiente");
+        const uRef = db.collection('usuarios').doc(userData.email);
+        await db.runTransaction(async (t) => {
+            const d = await t.get(uRef);
+            t.update(uRef, { saldo: d.data().saldo - am });
+        });
 
-        // Descontar saldo instantáneamente para evitar doble retiro
-        const userRef = db.collection('usuarios').doc(userData.email);
-        
-        try {
-            await db.runTransaction(async (t) => {
-                const doc = await t.get(userRef);
-                const currentSaldo = doc.data().saldo;
-                if(currentSaldo < amount) throw "Saldo insuficiente";
-                t.update(userRef, { saldo: currentSaldo - amount });
-            });
-
-            // Crear registro de retiro
-            await db.collection('retiros').add({
-                userId: userData.email, userNick: userData.nick,
-                method: method, address: address, amount: amount,
-                status: 'pendiente', createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-            
-            msg("Solicitud enviada con éxito", true);
-            document.getElementById('w-address').value = "";
-            document.getElementById('w-amount').value = "";
-        } catch(err) { msg(err); }
+        await db.collection('retiros').add({
+            userId: userData.email, userNick: userData.nick,
+            method: m, address: a, amount: am, status: 'pendiente',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        msg("Solicitud enviada", true);
     }
 
-
-    // ---------------------------------------------
-    // PANEL ADMIN MASTER (SOLO NEVINARG)
-    // ---------------------------------------------
+    // --- FUNCIONES ADMIN ---
     function admS(id) {
-        // Estilos de pestañas admin
-        document.querySelectorAll('#v-admin .adm-sec').forEach(x => x.classList.add('hidden'));
+        document.querySelectorAll('.adm-sec').forEach(x => x.classList.add('hidden'));
         document.getElementById(id).classList.remove('hidden');
-        document.querySelectorAll('#v-admin button').forEach(b => {
-            if(b.innerText.includes('NUEVA') || b.innerText.includes('USUARIOS') || b.innerText.includes('RESEÑAS') || b.innerText.includes('PAGOS')) {
-                b.classList.replace('bg-purple-600', 'bg-gray-800');
-            }
-        });
-        event.currentTarget.classList.replace('bg-gray-800', 'bg-purple-600');
     }
 
     function toggleSpecificEmail() {
-        const val = document.getElementById('adm-t-target').value;
-        document.getElementById('adm-t-email').classList.toggle('hidden', val === 'all');
+        const v = document.getElementById('adm-t-target').value;
+        document.getElementById('adm-t-email').classList.toggle('hidden', v === 'all');
     }
 
     async function createTask() {
-        const n = document.getElementById('adm-t-name').value.trim();
-        const l = document.getElementById('adm-t-link').value.trim();
+        const n = document.getElementById('adm-t-name').value;
+        const l = document.getElementById('adm-t-link').value;
         const p = parseFloat(document.getElementById('adm-t-pay').value);
-        const targetType = document.getElementById('adm-t-target').value;
-        const targetEmail = document.getElementById('adm-t-email').value.trim().toLowerCase();
-
-        if(!n || !l || !p) return msg("Faltan datos de la tarea");
-        let targetFinal = 'all';
-        if(targetType === 'specific') {
-            if(!targetEmail) return msg("Ingresa el correo del trabajador");
-            targetFinal = targetEmail;
-        }
-
-        await db.collection('tareas').add({ 
-            name: n, link: l, pay: p, target: targetFinal, active: true,
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        const t = document.getElementById('adm-t-target').value;
+        const e = document.getElementById('adm-t-email').value;
+        await db.collection('tareas').add({
+            name: n, link: l, pay: p, target: t === 'specific' ? e : 'all',
+            active: true, createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-        
-        msg("Tarea Publicada en Vivo", true);
-        document.getElementById('adm-t-name').value = '';
-        document.getElementById('adm-t-link').value = '';
+        msg("Tarea creada", true);
     }
 
     function listenAdminData() {
-        // 1. Usuarios en vivo
+        // Usuarios y BAN
         db.collection('usuarios').orderBy('createdAt', 'desc').onSnapshot(snap => {
-            const cont = document.getElementById('a-u');
-            cont.innerHTML = "<h3 class='text-white mb-2'>Lista de Reseñadores Registrados</h3>";
+            const c = document.getElementById('a-u');
+            c.innerHTML = "<h3 class='text-xs text-gray-400 mb-2'>Control de Usuarios</h3>";
             snap.forEach(doc => {
-                const u = doc.data();
-                if(u.email === MASTER_EMAIL) return; // Ocultar al admin de la lista
-                cont.innerHTML += `
-                    <div class="glass p-3 flex justify-between items-center text-[10px] border-l-2 ${u.banned ? 'border-red-500 opacity-50' : 'border-green-500'}">
-                        <div>
-                            <span class="text-white font-bold text-xs">${u.nick}</span> <br>
-                            <span class="text-gray-400">${u.email}</span><br>
-                            <span class="text-yellow-500 font-bold">Saldo: $${u.saldo.toFixed(2)}</span>
-                            ${u.referredBy ? `<span class="text-purple-400 ml-2">Ref por: ${u.referredBy}</span>` : ''}
-                        </div>
-                        <button onclick="banUser('${u.email}', ${u.banned})" class="${u.banned ? 'bg-gray-600' : 'bg-red-600'} px-3 py-2 rounded text-white font-bold">
-                            ${u.banned ? 'DESBANEAR' : 'BANEAR'}
-                        </button>
+                const u = doc.data(); if(u.email === MASTER_EMAIL) return;
+                c.innerHTML += `
+                    <div class="glass p-3 flex justify-between items-center text-[10px] ${u.banned ? 'border-red-500' : ''}">
+                        <div><b class="text-white">${u.nick}</b><br>${u.email}<br><span class="text-green-400">$${u.saldo.toFixed(2)}</span></div>
+                        <button onclick="banUser('${u.email}', ${u.banned})" class="${u.banned ? 'bg-green-600' : 'bg-red-600'} p-2 rounded font-bold">${u.banned ? 'DESBAN' : 'BANEAR'}</button>
                     </div>`;
             });
         });
 
-        // 2. Reseñas Pendientes
+        // Revisar Reseñas
         db.collection('resenas').where('status', '==', 'pendiente').onSnapshot(snap => {
-            const cont = document.getElementById('a-r');
+            const c = document.getElementById('a-r');
             document.getElementById('badge-resenas').innerText = snap.size;
             document.getElementById('badge-resenas').classList.toggle('hidden', snap.size === 0);
-            
-            cont.innerHTML = "";
-            if(snap.size === 0) cont.innerHTML = "<p class='text-xs text-gray-500'>Todo limpio, jefe.</p>";
-            
+            c.innerHTML = "";
             snap.forEach(doc => {
                 const r = doc.data();
-                cont.innerHTML += `
-                    <div class="glass p-3 text-[11px] border border-white/10">
-                        <div class="flex justify-between mb-2">
-                            <span class="text-white font-bold">${r.userNick} <span class="text-gray-400 font-normal">(${r.userId})</span></span>
-                            <span class="text-green-400 font-black">$${r.pay}</span>
-                        </div>
-                        <p class="text-purple-400 mb-2">Tarea: ${r.taskName}</p>
-                        <a href="${r.url}" target="_blank" class="text-blue-400 underline italic bg-blue-900/30 p-1 rounded">Ver Comprobante URL</a>
-                        <div class="flex gap-2 mt-4">
-                            <button onclick="processReview('${doc.id}', '${r.userId}', ${r.pay}, true)" class="bg-green-600 hover:bg-green-500 px-4 py-2 rounded font-black text-black flex-grow">APROBAR PAGO</button>
-                            <button onclick="processReview('${doc.id}', '${r.userId}', ${r.pay}, false)" class="bg-red-600 hover:bg-red-500 px-4 py-2 rounded font-black text-white">RECHAZAR</button>
+                c.innerHTML += `
+                    <div class="glass p-3 text-[10px]">
+                        <p class="text-white font-bold">${r.userNick} en ${r.taskName}</p>
+                        <a href="${r.url}" target="_blank" class="text-blue-400 block my-2 underline">VER LINK</a>
+                        <div class="flex gap-2">
+                            <button onclick="processReview('${doc.id}', '${r.userId}', ${r.pay}, true)" class="bg-green-600 p-2 rounded flex-grow font-bold">APROBAR ($${r.pay})</button>
+                            <button onclick="processReview('${doc.id}', '${r.userId}', ${r.pay}, false)" class="bg-red-600 p-2 rounded font-bold">RECHAZAR</button>
                         </div>
                     </div>`;
             });
         });
 
-        // 3. Retiros Pendientes (Cajero)
+        // Pagar Retiros
         db.collection('retiros').where('status', '==', 'pendiente').onSnapshot(snap => {
-            const cont = document.getElementById('a-w');
+            const c = document.getElementById('a-w');
             document.getElementById('badge-pagos').innerText = snap.size;
             document.getElementById('badge-pagos').classList.toggle('hidden', snap.size === 0);
-            
-            cont.innerHTML = "";
-            if(snap.size === 0) cont.innerHTML = "<p class='text-xs text-gray-500'>No hay solicitudes de retiro.</p>";
-
+            c.innerHTML = "";
             snap.forEach(doc => {
                 const w = doc.data();
-                cont.innerHTML += `
-                    <div class="glass p-4 text-[11px] border border-yellow-500/50">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-white font-bold text-sm">${w.userNick} solicita retiro</span>
-                            <span class="text-yellow-400 font-black text-lg">$${w.amount.toFixed(2)}</span>
-                        </div>
-                        <div class="bg-black p-2 rounded text-gray-300 mb-3 font-mono">
-                            Vía: <b class="text-white">${w.method}</b><br>
-                            Datos: <span class="text-green-300 select-all">${w.address}</span>
-                        </div>
+                c.innerHTML += `
+                    <div class="glass p-3 text-[10px] border-yellow-500/30 border">
+                        <p class="text-white"><b>${w.userNick}</b> solicita <b>$${w.amount.toFixed(2)}</b></p>
+                        <p class="bg-black p-2 my-2 text-green-300 font-mono">${w.method}: ${w.address}</p>
                         <div class="flex gap-2">
-                            <button onclick="processWithdraw('${doc.id}', true, '${w.userId}', ${w.amount})" class="bg-green-600 px-4 py-2 rounded text-black font-bold flex-grow">MARCAR COMO PAGADO</button>
-                            <button onclick="processWithdraw('${doc.id}', false, '${w.userId}', ${w.amount})" class="bg-red-600 px-4 py-2 rounded text-white font-bold">CANCELAR Y REEMBOLSAR</button>
+                            <button onclick="processWithdraw('${doc.id}', true)" class="bg-green-600 p-2 rounded flex-grow font-bold">MARCAR PAGADO</button>
+                            <button onclick="processWithdraw('${doc.id}', false, '${w.userId}', ${w.amount})" class="bg-red-600 p-2 rounded font-bold">CANCELAR</button>
                         </div>
                     </div>`;
             });
         });
     }
 
-    async function banUser(email, isBanned) {
-        await db.collection('usuarios').doc(email).update({ banned: !isBanned });
-        msg(isBanned ? "Usuario Desbaneado" : "Usuario Baneado", true);
-    }
+    async function banUser(email, isB) { await db.collection('usuarios').doc(email).update({ banned: !isB }); }
 
-    async function processReview(reviewId, userId, pay, isApproved) {
-        // Cambiar status de reseña
-        await db.collection('resenas').doc(reviewId).update({ status: isApproved ? 'aprobado' : 'rechazado' });
-        
-        if(isApproved) {
-            // Pagar al reseñador
-            const userRef = db.collection('usuarios').doc(userId);
-            const userDoc = await userRef.get();
-            const userData = userDoc.data();
-            
-            await userRef.update({ saldo: firebase.firestore.FieldValue.increment(pay) });
-
-            // Sistema de Referidos (Pagar 10% al jefe si existe)
-            if(userData.referredBy) {
-                const bossSnap = await db.collection('usuarios').where('refCode', '==', userData.referredBy).get();
-                if(!bossSnap.empty) {
-                    const bossDoc = bossSnap.docs[0];
-                    const bonoRef = pay * 0.10;
-                    await bossDoc.ref.update({ saldo: firebase.firestore.FieldValue.increment(bonoRef) });
-                }
-            }
-            msg("Reseña Aprobada y pagada (Con comisión si aplica)", true);
-        } else {
-            msg("Reseña Rechazada", false);
+    async function processReview(rid, uid, p, ok) {
+        await db.collection('resenas').doc(rid).update({ status: ok ? 'aprobado' : 'rechazado' });
+        if(ok) {
+            const uRef = db.collection('usuarios').doc(uid);
+            await db.runTransaction(async (t) => {
+                const d = await t.get(uRef);
+                t.update(uRef, { saldo: d.data().saldo + p });
+            });
         }
     }
 
-    async function processWithdraw(reqId, isApproved, userId, amount) {
-        await db.collection('retiros').doc(reqId).update({ status: isApproved ? 'aprobado' : 'rechazado' });
-        
-        if(!isApproved) {
-            // Reembolsar saldo si se rechaza
-            await db.collection('usuarios').doc(userId).update({ saldo: firebase.firestore.FieldValue.increment(amount) });
-            msg("Retiro cancelado. Saldo devuelto al usuario.");
-        } else {
-            msg("Retiro marcado como pagado exitosamente.", true);
+    async function processWithdraw(wid, ok, uid, am) {
+        await db.collection('retiros').doc(wid).update({ status: ok ? 'pagado' : 'cancelado' });
+        if(!ok) {
+            const uRef = db.collection('usuarios').doc(uid);
+            await db.runTransaction(async (t) => {
+                const d = await t.get(uRef);
+                t.update(uRef, { saldo: d.data().saldo + am });
+            });
         }
     }
-
 </script>
 </body>
 </html>
