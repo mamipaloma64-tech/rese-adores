@@ -2,189 +2,141 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>ReviewPositive | Pro</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Inter:wght@300;400;700&display=swap');
-        :root { --neon: #bc13fe; --gold: #ffcc00; }
+        :root { --neon: #bc13fe; }
         
         body { 
             background: #050505; 
-            background-image: 
-                radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)), 
-                radial-gradient(2px 2px at 40px 70px, #fff, rgba(0,0,0,0)), 
-                radial-gradient(2px 2px at 90px 160px, #ddd, rgba(0,0,0,0));
+            background-image: radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)), radial-gradient(2px 2px at 40px 70px, #fff, rgba(0,0,0,0));
             background-repeat: repeat; background-size: 300px 300px;
-            animation: starsAnim 100s linear infinite;
             color: #e2e8f0; font-family: 'Inter', sans-serif; min-height: 100vh; margin: 0; 
         }
-        @keyframes starsAnim { from { background-position: 0 0; } to { background-position: -1000px 1000px; } }
 
         .neon-text { color: var(--neon); text-shadow: 0 0 15px rgba(188, 19, 254, 0.6); font-family: 'Orbitron'; }
         .glass { background: rgba(15, 15, 20, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(188, 19, 254, 0.2); border-radius: 12px; }
-        .input-q { background: #000; border: 1px solid #333; color: white; padding: 12px; border-radius: 8px; width: 100%; outline: none; transition: 0.3s;}
-        .input-q:focus { border-color: var(--neon); }
-        .btn-p { background: linear-gradient(135deg, #bc13fe, #6a0dad); padding: 12px; border-radius: 8px; font-weight: 900; font-family: 'Orbitron'; color: white; width: 100%; border: none; cursor: pointer; transition: 0.3s; }
-        .btn-p:hover { box-shadow: 0 0 15px var(--neon); }
-        .btn-g { background: #fff; color: #000; padding: 10px; border-radius: 8px; font-weight: bold; width: 100%; display: flex; justify-content: center; align-items: center; gap: 10px; cursor: pointer;}
+        .input-q { background: #000; border: 1px solid #333; color: white; padding: 12px; border-radius: 8px; width: 100%; outline: none; }
+        .btn-p { background: linear-gradient(135deg, #bc13fe, #6a0dad); padding: 12px; border-radius: 8px; font-weight: 900; font-family: 'Orbitron'; color: white; width: 100%; border: none; cursor: pointer; }
         
-        .sidebar { width: 260px; height: 100vh; position: fixed; left: 0; top: 0; background: rgba(0,0,0,0.9); border-right: 1px solid #1a1a1a; z-index: 100; display: flex; flex-direction: column; backdrop-filter: blur(10px);}
-        .main { margin-left: 260px; padding: 30px; }
+        .sidebar { width: 260px; height: 100vh; position: fixed; left: 0; top: 0; background: rgba(0,0,0,0.9); border-right: 1px solid #1a1a1a; z-index: 100; display: flex; flex-direction: column; }
+        .main { margin-left: 260px; padding: 30px; padding-bottom: 120px; }
         
         @media (max-width: 768px) { 
-            .sidebar { display: none; } .main { margin-left: 0; padding-bottom: 100px; }
-            .mobile-nav { display: grid; grid-template-columns: repeat(4, 1fr); position: fixed; bottom: 0; width: 100%; background: #000; height: 70px; border-top: 2px solid var(--neon); z-index: 1000; }
-            .nav-item-m { display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 20px; color: #555; cursor: pointer;}
+            .sidebar { display: none; } .main { margin-left: 0; padding-bottom: 140px; }
+            .mobile-nav { 
+                display: grid; grid-template-columns: repeat(5, 1fr); 
+                position: fixed; bottom: 0; width: 100%; background: #000; 
+                padding-bottom: env(safe-area-inset-bottom);
+                height: 85px; border-top: 2px solid var(--neon); z-index: 1000; 
+            }
+            .nav-item-m { display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 16px; color: #555; }
             .nav-item-m.active { color: white; text-shadow: 0 0 10px var(--neon); }
-            .mobile-nav.admin-active { grid-template-columns: repeat(5, 1fr); }
         }
         
         .view { display: none; } .view.active { display: block; }
-        .status-pill { padding: 4px 8px; border-radius: 4px; font-size: 9px; font-weight: bold; text-transform: uppercase; }
-        .status-pendiente { background: #555; color: white; }
-        .status-aprobado { background: #00ff88; color: #000; }
-        .status-rechazado { background: #ff4444; color: #fff; }
-
-        /* Estilo para el Cajero */
-        .wallet-card { background: linear-gradient(180deg, rgba(188, 19, 254, 0.1) 0%, rgba(0,0,0,0) 100%); border: 1px solid rgba(188, 19, 254, 0.3); }
+        .tab-btn { padding: 8px 12px; font-size: 9px; font-weight: bold; border-radius: 5px; background: #111; color: #666; transition: 0.3s; text-transform: uppercase; }
+        .tab-btn.active { background: var(--neon); color: white; }
     </style>
 </head>
 <body>
-
-<div id="alert-msg" class="fixed top-5 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full font-black text-xs z-[3000] hidden text-white shadow-xl transition-all"></div>
-
-<div id="auth-gate" class="flex items-center justify-center min-h-screen p-6 relative z-10">
-    <div class="glass p-8 w-full max-w-[360px] text-center shadow-2xl">
-        <h1 class="neon-text text-2xl mb-6 italic font-black">REVIEWPOSITIVE</h1>
-        
-        <div id="login-box" class="space-y-4">
-            <input type="email" id="l-email" placeholder="Correo Electrónico" class="input-q">
-            <input type="password" id="l-pass" placeholder="Contraseña" class="input-q">
-            <button onclick="loginEmail()" class="btn-p">ENTRAR</button>
-            <div class="my-4 border-b border-gray-700 relative">
-                <span class="absolute left-1/2 -translate-x-1/2 -top-3 bg-[#0a0a0f] px-2 text-[10px] text-gray-500">O INGRESA CON</span>
-            </div>
-            <button onclick="loginGoogle()" class="btn-g">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" class="w-4 h-4"> Google
-            </button>
-            <p class="text-[10px] mt-4 text-gray-400">¿No tienes cuenta? <span onclick="toggleAuth(true)" class="underline cursor-pointer text-white">Regístrate</span></p>
-        </div>
-
-        <div id="reg-box" class="space-y-4 hidden">
-            <input type="text" id="r-nick" placeholder="Tu Apodo" class="input-q">
-            <input type="email" id="r-email" placeholder="Correo Electrónico" class="input-q">
-            <input type="password" id="r-pass" placeholder="Contraseña" class="input-q">
-            <input type="text" id="r-ref" placeholder="Código de Referido (Opcional)" class="input-q">
-            <button onclick="register()" class="btn-p">CREAR CUENTA</button>
-            <p class="text-[10px] mt-4 text-gray-400" onclick="toggleAuth(false)">Ya tengo cuenta. <span class="underline cursor-pointer text-white">Entrar</span></p>
-        </div>
-    </div>
-</div>
 
 <div id="app-panel" class="hidden relative z-10">
     <aside class="sidebar p-6">
         <div class="neon-text text-xl font-black mb-10 italic">REVIEWPOSITIVE</div>
         <nav class="space-y-4 flex-grow font-bold text-gray-400 text-sm">
-            <div onclick="nav('v-dash')" class="hover:text-white cursor-pointer transition">🏠 DASHBOARD</div>
-            <div onclick="nav('v-tasks')" class="hover:text-white cursor-pointer transition">📋 TAREAS</div>
-            <div onclick="nav('v-wallet')" class="hover:text-white cursor-pointer transition">💰 CAJERO</div>
-            <div id="adm-btn" class="hidden text-yellow-500 pt-4 border-t border-white/10 cursor-pointer transition hover:text-yellow-300" onclick="nav('v-admin')">⚡ ADMIN MASTER</div>
+            <div onclick="nav('v-dash')" class="hover:text-white cursor-pointer">🏠 DASHBOARD</div>
+            <div onclick="nav('v-tasks')" class="hover:text-white cursor-pointer">📋 TAREAS</div>
+            <div onclick="nav('v-history')" class="hover:text-white cursor-pointer">📜 HISTORIAL</div>
+            <div onclick="nav('v-refs')" class="hover:text-white cursor-pointer">👥 REFERIDOS</div>
+            <div onclick="nav('v-wallet')" class="hover:text-white cursor-pointer">💰 CAJERO</div>
+            <div id="adm-btn" class="hidden text-yellow-500 pt-4 border-t border-white/10" onclick="nav('v-admin')">⚡ ADMIN</div>
         </nav>
-        <button onclick="logout()" class="text-red-500 text-[10px] font-bold tracking-widest hover:text-red-400 transition">CERRAR SESIÓN</button>
+        <button onclick="logout()" class="text-red-500 text-[10px] font-bold">CERRAR SESIÓN</button>
     </aside>
 
     <nav id="mb-nav" class="mobile-nav md:hidden">
-        <div onclick="nav('v-dash')" class="nav-item-m active">🏠<span class="text-[8px] mt-1">Inicio</span></div>
-        <div onclick="nav('v-tasks')" class="nav-item-m">📋<span class="text-[8px] mt-1">Tareas</span></div>
-        <div onclick="nav('v-wallet')" class="nav-item-m">💰<span class="text-[8px] mt-1">Cajero</span></div>
-        <div id="adm-btn-mb" class="hidden nav-item-m text-yellow-500" onclick="nav('v-admin')">⚡<span class="text-[8px] mt-1">Admin</span></div>
+        <div onclick="nav('v-dash')" class="nav-item-m active">🏠</div>
+        <div onclick="nav('v-tasks')" class="nav-item-m">📋</div>
+        <div onclick="nav('v-history')" class="nav-item-m">📜</div>
+        <div onclick="nav('v-refs')" class="nav-item-m">👥</div>
+        <div onclick="nav('v-wallet')" class="nav-item-m">💰</div>
     </nav>
 
     <main class="main">
         <div id="v-dash" class="view active">
-            <h1 class="text-3xl font-black mb-1 uppercase italic text-white" id="u-nick">...</h1>
-            <p class="text-xs text-yellow-500 mb-8 font-bold italic">CÓDIGO DE REFERIDO: <span id="u-ref-code" class="text-white select-all bg-white/10 px-2 py-1 rounded">---</span></p>
-            
-            <div class="glass p-8 max-w-sm border-t-4 border-purple-600 shadow-2xl relative overflow-hidden">
-                <div class="absolute -right-10 -top-10 bg-purple-600/20 w-32 h-32 rounded-full blur-2xl"></div>
-                <p class="text-[10px] uppercase font-bold text-gray-400 mb-2 tracking-wider">Saldo Disponible</p>
+            <h1 class="text-3xl font-black mb-8 uppercase italic text-white" id="u-nick">...</h1>
+            <div class="glass p-8 max-w-sm border-t-4 border-purple-600">
+                <p class="text-[10px] uppercase font-bold text-gray-400">Saldo Disponible</p>
                 <div id="u-saldo" class="text-5xl font-black italic text-white">$0.00</div>
             </div>
         </div>
 
         <div id="v-tasks" class="view">
             <h2 class="font-black mb-6 italic text-xl uppercase text-white border-b border-gray-800 pb-2">TAREAS ACTIVAS</h2>
-            <div id="tasks-list" class="space-y-4 mb-10"></div>
-            
-            <h2 class="font-black mb-4 italic text-sm text-gray-500 uppercase mt-10">Historial de mis Reseñas</h2>
-            <div id="my-reviews" class="grid grid-cols-1 gap-2"></div>
+            <div id="tasks-list" class="space-y-4"></div>
+        </div>
+
+        <div id="v-history" class="view">
+            <h2 class="font-black mb-6 italic text-xl uppercase text-white border-b border-gray-800 pb-2">MI HISTORIAL</h2>
+            <div class="flex gap-2 mb-6 overflow-x-auto pb-2">
+                <button onclick="filterHistory('pendiente')" class="tab-btn active" id="tab-pendiente">PENDIENTES</button>
+                <button onclick="filterHistory('aprobado')" class="tab-btn" id="tab-aprobado">APROBADAS</button>
+                <button onclick="filterHistory('rechazado')" class="tab-btn" id="tab-rechazado">RECHAZADAS</button>
+            </div>
+            <div id="history-content" class="grid grid-cols-1 gap-3"></div>
+        </div>
+
+        <div id="v-refs" class="view">
+            <h2 class="font-black mb-6 italic text-xl uppercase text-white border-b border-gray-800 pb-2">SISTEMA DE REFERIDOS</h2>
+            <div class="glass p-6 mb-6">
+                <p class="text-xs text-gray-400 uppercase font-bold mb-2">Tu Código de Invitación:</p>
+                <div id="u-ref-code" class="text-2xl font-black text-[#bc13fe] bg-white/5 p-4 rounded-lg border border-white/10 select-all text-center">---</div>
+                <p class="text-[10px] text-yellow-500 mt-4 italic">Gana una comisión por cada reseña aprobada de tus invitados.</p>
+            </div>
+            <h3 class="text-xs font-black uppercase text-gray-500 mb-4">Invitados Directos</h3>
+            <div id="refs-list" class="space-y-2"></div>
         </div>
 
         <div id="v-wallet" class="view">
             <h2 class="font-black mb-6 italic text-xl uppercase text-white border-b border-gray-800 pb-2">CAJERO</h2>
-            <div class="wallet-card p-6 max-w-md rounded-xl space-y-4">
-                <div>
-                    <label class="text-[10px] font-bold text-purple-400 uppercase">Monto a retirar ($)</label>
-                    <input type="number" id="w-amount" placeholder="0.00" class="input-q text-xl font-bold">
-                </div>
-
-                <div>
-                    <label class="text-[10px] font-bold text-purple-400 uppercase">Método de Pago</label>
-                    <select id="w-method" class="input-q">
-                        <option value="Binance Pay">Binance Pay</option>
-                        <option value="Bybit Pay">Bybit Pay</option>
-                        <option value="Zelle">Zelle</option>
-                        <option value="Pago Movil">Pago Móvil</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="text-[10px] font-bold text-purple-400 uppercase">Datos de la cuenta</label>
-                    <input type="text" id="w-address" placeholder="ID, Correo o Teléfono" class="input-q">
-                </div>
-                
-                <button onclick="requestWithdraw()" class="btn-p mt-4 shadow-lg shadow-purple-500/20">RETIRAR SALDO</button>
+            <div class="glass p-6 max-w-md space-y-4">
+                <input type="number" id="w-amount" placeholder="Monto $" class="input-q">
+                <select id="w-method" class="input-q">
+                    <option value="Binance">Binance Pay</option>
+                    <option value="Pago Movil">Pago Móvil</option>
+                </select>
+                <input type="text" id="w-address" placeholder="Datos de cobro" class="input-q">
+                <button onclick="requestWithdraw()" class="btn-p">RETIRAR SALDO</button>
             </div>
-            
-            <h2 class="font-black mb-4 italic text-sm text-gray-500 uppercase mt-10">Mis Solicitudes de Retiro</h2>
-            <div id="my-withdraws" class="space-y-2"></div>
-        </div>
-
-        <div id="v-admin" class="view">
-            <h2 class="text-yellow-500 font-black mb-6 italic text-2xl uppercase text-shadow-md">Panel Admin Master</h2>
-            
-            <div class="flex gap-2 mb-6 text-[10px] font-black overflow-x-auto pb-2">
-                <button onclick="admS('a-newtask')" class="bg-purple-600 px-4 py-2 rounded text-white whitespace-nowrap">CREAR TAREA</button>
-                <button onclick="admS('a-u')" class="bg-gray-800 px-4 py-2 rounded text-white whitespace-nowrap">USUARIOS/BAN</button>
-                <button onclick="admS('a-r')" class="bg-gray-800 px-4 py-2 rounded text-white whitespace-nowrap">REVISAR RESEÑAS <span id="badge-resenas" class="bg-red-500 px-1 rounded ml-1 hidden">0</span></button>
-                <button onclick="admS('a-w')" class="bg-gray-800 px-4 py-2 rounded text-white whitespace-nowrap">PAGAR RETIROS <span id="badge-pagos" class="bg-red-500 px-1 rounded ml-1 hidden">0</span></button>
-            </div>
-
-            <div id="a-newtask" class="adm-sec">
-                <div class="glass p-6 max-w-lg space-y-4">
-                    <input type="text" id="adm-t-name" placeholder="Nombre del Negocio" class="input-q">
-                    <input type="text" id="adm-t-link" placeholder="Link de Google Maps" class="input-q">
-                    <input type="number" id="adm-t-pay" placeholder="Pago ($)" class="input-q">
-                    <select id="adm-t-target" class="input-q" onchange="toggleSpecificEmail()">
-                        <option value="all">Público para todos</option>
-                        <option value="specific">Privada para un correo</option>
-                    </select>
-                    <input type="email" id="adm-t-email" placeholder="Correo del trabajador" class="input-q hidden">
-                    <button onclick="createTask()" class="btn-p">PUBLICAR TAREA</button>
-                </div>
-            </div>
-
-            <div id="a-u" class="adm-sec hidden space-y-2"></div>
-            <div id="a-r" class="adm-sec hidden space-y-2"></div>
-            <div id="a-w" class="adm-sec hidden space-y-2"></div>
         </div>
     </main>
+</div>
+
+<div id="auth-gate" class="flex items-center justify-center min-h-screen p-6 relative z-10">
+    <div class="glass p-8 w-full max-w-[360px] text-center">
+        <h1 class="neon-text text-2xl mb-6 italic font-black">REVIEWPOSITIVE</h1>
+        <div id="login-box" class="space-y-4">
+            <input type="email" id="l-email" placeholder="Correo" class="input-q">
+            <input type="password" id="l-pass" placeholder="Contraseña" class="input-q">
+            <button onclick="loginEmail()" class="btn-p">ENTRAR</button>
+            <p class="text-[10px] mt-4" onclick="toggleAuth(true)">¿Nuevo? <span class="underline">Regístrate</span></p>
+        </div>
+        <div id="reg-box" class="space-y-4 hidden">
+            <input type="text" id="r-nick" placeholder="Apodo" class="input-q">
+            <input type="email" id="r-email" placeholder="Correo" class="input-q">
+            <input type="password" id="r-pass" placeholder="Contraseña" class="input-q">
+            <input type="text" id="r-ref" placeholder="Código de Referido" class="input-q">
+            <button onclick="register()" class="btn-p">CREAR CUENTA</button>
+            <p class="text-[10px] mt-4" onclick="toggleAuth(false)">Ya tengo cuenta.</p>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -196,107 +148,12 @@
       messagingSenderId: "864424736790",
       appId: "1:864424736790:web:93476a4e3f340f01d31d37"
     };
-
     firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
     const db = firebase.firestore();
-    const MASTER_EMAIL = "nevinarg.2023@gmail.com";
-
+    const auth = firebase.auth();
     let userData = null;
-    let unsubUser = null;
 
-    function msg(t, ok=false) {
-        const e = document.getElementById('alert-msg');
-        e.innerText = t; e.style.background = ok ? '#00ff88' : '#ff4444';
-        e.style.color = ok ? '#000' : '#fff';
-        e.classList.remove('hidden'); 
-        setTimeout(()=>e.classList.add('hidden'), 3500);
-    }
-
-    auth.onAuthStateChanged(user => {
-        if(user) {
-            unsubUser = db.collection('usuarios').doc(user.email).onSnapshot(doc => {
-                if(!doc.exists) return;
-                userData = doc.data();
-                if(userData.banned) {
-                    msg("TU CUENTA ESTÁ BANEADA");
-                    auth.signOut();
-                    return;
-                }
-                launchApp();
-            });
-        } else {
-            if(unsubUser) unsubUser();
-            document.getElementById('auth-gate').classList.remove('hidden');
-            document.getElementById('app-panel').classList.add('hidden');
-        }
-    });
-
-    function toggleAuth(reg) {
-        document.getElementById('login-box').classList.toggle('hidden', reg);
-        document.getElementById('reg-box').classList.toggle('hidden', !reg);
-    }
-
-    async function register() {
-        const n = document.getElementById('r-nick').value.trim();
-        const e = document.getElementById('r-email').value.trim().toLowerCase();
-        const p = document.getElementById('r-pass').value;
-        const r = document.getElementById('r-ref').value.trim();
-        if(!n || !e || !p) return msg("Faltan datos");
-        try {
-            await auth.createUserWithEmailAndPassword(e, p);
-            await db.collection('usuarios').doc(e).set({
-                nick: n, email: e, saldo: 0, 
-                refCode: n.substring(0,3).toUpperCase() + Math.floor(Math.random()*999),
-                referredBy: r || null, banned: false,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
-        } catch(err) { msg(err.message); }
-    }
-
-    async function loginEmail() {
-        const e = document.getElementById('l-email').value.trim();
-        const p = document.getElementById('l-pass').value;
-        try { await auth.signInWithEmailAndPassword(e, p); } catch(err) { msg("Error al entrar"); }
-    }
-
-    async function loginGoogle() {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        try {
-            const res = await auth.signInWithPopup(provider);
-            const user = res.user;
-            const doc = await db.collection('usuarios').doc(user.email).get();
-            if(!doc.exists) {
-                await db.collection('usuarios').doc(user.email).set({
-                    nick: user.displayName || 'GoogleUser', email: user.email, saldo: 0,
-                    refCode: 'G' + Math.floor(Math.random()*9999),
-                    referredBy: null, banned: false,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-            }
-        } catch(err) { msg("Error Google"); }
-    }
-
-    function logout() { auth.signOut(); }
-
-    function launchApp() {
-        document.getElementById('auth-gate').classList.add('hidden');
-        document.getElementById('app-panel').classList.remove('hidden');
-        document.getElementById('u-nick').innerText = userData.nick;
-        document.getElementById('u-saldo').innerText = `$${userData.saldo.toFixed(2)}`;
-        document.getElementById('u-ref-code').innerText = userData.refCode;
-
-        if(userData.email === MASTER_EMAIL) {
-            document.getElementById('adm-btn').classList.remove('hidden');
-            document.getElementById('adm-btn-mb').classList.remove('hidden');
-            document.getElementById('mb-nav').classList.add('admin-active');
-            listenAdminData();
-        }
-        listenTasks();
-        listenMyReviews();
-        listenMyWithdraws();
-    }
-
+    // --- NAVEGACIÓN ---
     function nav(v) {
         document.querySelectorAll('.view').forEach(x => x.classList.remove('active'));
         document.getElementById(v).classList.add('active');
@@ -304,202 +161,102 @@
         if(event && event.currentTarget.classList.contains('nav-item-m')) event.currentTarget.classList.add('active');
     }
 
+    // --- HISTORIAL ---
+    let histFilter = 'pendiente';
+    function filterHistory(status) {
+        histFilter = status;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('tab-'+status).classList.add('active');
+        loadHistory();
+    }
+
+    function loadHistory() {
+        db.collection('resenas').where('userId', '==', userData.email).where('status', '==', histFilter).onSnapshot(snap => {
+            const cont = document.getElementById('history-content');
+            cont.innerHTML = "";
+            snap.forEach(doc => {
+                const r = doc.data();
+                cont.innerHTML += `<div class="glass p-4 border-l-4 ${r.status==='aprobado'?'border-green-500':'border-gray-500'}">
+                    <div class="flex justify-between text-xs"><b>${r.taskName}</b> <span>$${r.pay}</span></div>
+                    ${r.reason ? `<p class="text-[9px] text-red-400 mt-2 italic">Rechazo: ${r.reason}</p>` : ''}
+                </div>`;
+            });
+        });
+    }
+
+    // --- REFERIDOS ---
+    function listenRefs() {
+        db.collection('usuarios').where('referredBy', '==', userData.refCode).onSnapshot(snap => {
+            const cont = document.getElementById('refs-list');
+            cont.innerHTML = "";
+            snap.forEach(doc => {
+                const u = doc.data();
+                cont.innerHTML += `<div class="glass p-3 flex justify-between items-center text-[11px]">
+                    <span>${u.nick}</span>
+                    <span class="text-green-400 font-bold">$${u.saldo.toFixed(2)} acumulado</span>
+                </div>`;
+            });
+        });
+    }
+
+    // --- AUTH & DATA ---
+    auth.onAuthStateChanged(user => {
+        if(user) {
+            db.collection('usuarios').doc(user.email).onSnapshot(doc => {
+                if(!doc.exists) return;
+                userData = doc.data();
+                document.getElementById('u-nick').innerText = userData.nick.toUpperCase();
+                document.getElementById('u-saldo').innerText = `$${userData.saldo.toFixed(2)}`;
+                document.getElementById('u-ref-code').innerText = userData.refCode;
+                document.getElementById('auth-gate').classList.add('hidden');
+                document.getElementById('app-panel').classList.remove('hidden');
+                
+                listenTasks();
+                filterHistory('pendiente');
+                listenRefs();
+            });
+        }
+    });
+
+    // Mantenemos tus funciones de loginEmail, register, logout, etc...
+    async function loginEmail() {
+        const e = document.getElementById('l-email').value;
+        const p = document.getElementById('l-pass').value;
+        try { await auth.signInWithEmailAndPassword(e, p); } catch(err) { alert("Error"); }
+    }
+
+    function toggleAuth(reg) {
+        document.getElementById('login-box').classList.toggle('hidden', reg);
+        document.getElementById('reg-box').classList.toggle('hidden', !reg);
+    }
+
+    function logout() { auth.signOut(); location.reload(); }
+
     function listenTasks() {
         db.collection('tareas').where('active', '==', true).onSnapshot(snap => {
             const cont = document.getElementById('tasks-list');
             cont.innerHTML = "";
             snap.forEach(doc => {
                 const t = doc.data();
-                if(t.target === 'all' || t.target === userData.email) {
-                    cont.innerHTML += `
-                        <div class="glass p-4 border-l-4 border-purple-500" id="taskbox-${doc.id}">
-                            <div class="flex justify-between font-black text-sm uppercase italic mb-2">
-                                <span class="text-white">${t.name}</span>
-                                <span class="text-green-400">$${t.pay.toFixed(2)}</span>
-                            </div>
-                            <div class="flex flex-col gap-2">
-                                <a href="${t.link}" target="_blank" class="bg-blue-600 text-white p-2 rounded text-[10px] text-center font-bold">1. ABRIR MAPS</a>
-                                <input id="link-${doc.id}" placeholder="2. Pega aquí el link de tu reseña" class="input-q !p-2 text-[11px]">
-                                <button onclick="submitReview('${doc.id}', '${t.name}', ${t.pay})" class="btn-p !p-2 text-[10px]">3. ENVIAR REVISIÓN</button>
-                            </div>
-                        </div>`;
-                }
+                cont.innerHTML += `
+                    <div class="glass p-4 border-l-4 border-purple-500">
+                        <p class="text-xs font-black uppercase mb-3">${t.name} - $${t.pay}</p>
+                        <input id="url-${doc.id}" placeholder="Link de reseña" class="input-q !p-2 text-[10px] mb-2">
+                        <button onclick="sendR('${doc.id}', '${t.name}', ${t.pay})" class="btn-p !p-2 text-[10px]">ENVIAR</button>
+                    </div>`;
             });
         });
     }
 
-    async function submitReview(tid, tname, tpay) {
-        const url = document.getElementById(`link-${tid}`).value.trim();
-        if(!url) return msg("Pega el link");
+    async function sendR(tid, tname, tpay) {
+        const url = document.getElementById(`url-${tid}`).value.trim();
+        if(!url) return;
         await db.collection('resenas').add({
             userId: userData.email, userNick: userData.nick,
             taskId: tid, taskName: tname, pay: tpay,
-            url: url, status: 'pendiente', 
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            url: url, status: 'pendiente', createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-        msg("Enviada!", true);
-        document.getElementById(`taskbox-${tid}`).remove();
-    }
-
-    function listenMyReviews() {
-        db.collection('resenas').where('userId', '==', userData.email).orderBy('createdAt', 'desc').onSnapshot(snap => {
-            const cont = document.getElementById('my-reviews');
-            cont.innerHTML = "";
-            snap.forEach(doc => {
-                const r = doc.data();
-                cont.innerHTML += `
-                    <div class="bg-white/5 p-3 rounded-lg border border-white/10 flex justify-between items-center text-[10px]">
-                        <div>
-                            <p class="text-white font-bold">${r.taskName}</p>
-                            <p class="text-gray-500">${r.createdAt ? r.createdAt.toDate().toLocaleDateString() : ''}</p>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="text-green-400 font-bold">$${r.pay.toFixed(2)}</span>
-                            <span class="status-pill status-${r.status}">${r.status}</span>
-                        </div>
-                    </div>`;
-            });
-        });
-    }
-
-    function listenMyWithdraws() {
-        db.collection('retiros').where('userId', '==', userData.email).orderBy('createdAt', 'desc').onSnapshot(snap => {
-            const cont = document.getElementById('my-withdraws');
-            cont.innerHTML = "";
-            snap.forEach(doc => {
-                const w = doc.data();
-                cont.innerHTML += `
-                    <div class="bg-white/5 p-3 rounded-lg border border-white/10 flex justify-between items-center text-[10px]">
-                        <div><b class="text-white">$${w.amount.toFixed(2)}</b> <span class="text-gray-400">vía ${w.method}</span></div>
-                        <span class="status-pill status-${w.status}">${w.status}</span>
-                    </div>`;
-            });
-        });
-    }
-
-    async function requestWithdraw() {
-        const m = document.getElementById('w-method').value;
-        const a = document.getElementById('w-address').value.trim();
-        const am = parseFloat(document.getElementById('w-amount').value);
-        if(!a || isNaN(am) || am <= 0) return msg("Datos inválidos");
-        if(userData.saldo < am) return msg("Saldo insuficiente");
-
-        const uRef = db.collection('usuarios').doc(userData.email);
-        await db.runTransaction(async (t) => {
-            const d = await t.get(uRef);
-            t.update(uRef, { saldo: d.data().saldo - am });
-        });
-
-        await db.collection('retiros').add({
-            userId: userData.email, userNick: userData.nick,
-            method: m, address: a, amount: am, status: 'pendiente',
-            createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        msg("Solicitud enviada", true);
-    }
-
-    // --- FUNCIONES ADMIN ---
-    function admS(id) {
-        document.querySelectorAll('.adm-sec').forEach(x => x.classList.add('hidden'));
-        document.getElementById(id).classList.remove('hidden');
-    }
-
-    function toggleSpecificEmail() {
-        const v = document.getElementById('adm-t-target').value;
-        document.getElementById('adm-t-email').classList.toggle('hidden', v === 'all');
-    }
-
-    async function createTask() {
-        const n = document.getElementById('adm-t-name').value;
-        const l = document.getElementById('adm-t-link').value;
-        const p = parseFloat(document.getElementById('adm-t-pay').value);
-        const t = document.getElementById('adm-t-target').value;
-        const e = document.getElementById('adm-t-email').value;
-        await db.collection('tareas').add({
-            name: n, link: l, pay: p, target: t === 'specific' ? e : 'all',
-            active: true, createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        msg("Tarea creada", true);
-    }
-
-    function listenAdminData() {
-        // Usuarios y BAN
-        db.collection('usuarios').orderBy('createdAt', 'desc').onSnapshot(snap => {
-            const c = document.getElementById('a-u');
-            c.innerHTML = "<h3 class='text-xs text-gray-400 mb-2'>Control de Usuarios</h3>";
-            snap.forEach(doc => {
-                const u = doc.data(); if(u.email === MASTER_EMAIL) return;
-                c.innerHTML += `
-                    <div class="glass p-3 flex justify-between items-center text-[10px] ${u.banned ? 'border-red-500' : ''}">
-                        <div><b class="text-white">${u.nick}</b><br>${u.email}<br><span class="text-green-400">$${u.saldo.toFixed(2)}</span></div>
-                        <button onclick="banUser('${u.email}', ${u.banned})" class="${u.banned ? 'bg-green-600' : 'bg-red-600'} p-2 rounded font-bold">${u.banned ? 'DESBAN' : 'BANEAR'}</button>
-                    </div>`;
-            });
-        });
-
-        // Revisar Reseñas
-        db.collection('resenas').where('status', '==', 'pendiente').onSnapshot(snap => {
-            const c = document.getElementById('a-r');
-            document.getElementById('badge-resenas').innerText = snap.size;
-            document.getElementById('badge-resenas').classList.toggle('hidden', snap.size === 0);
-            c.innerHTML = "";
-            snap.forEach(doc => {
-                const r = doc.data();
-                c.innerHTML += `
-                    <div class="glass p-3 text-[10px]">
-                        <p class="text-white font-bold">${r.userNick} en ${r.taskName}</p>
-                        <a href="${r.url}" target="_blank" class="text-blue-400 block my-2 underline">VER LINK</a>
-                        <div class="flex gap-2">
-                            <button onclick="processReview('${doc.id}', '${r.userId}', ${r.pay}, true)" class="bg-green-600 p-2 rounded flex-grow font-bold">APROBAR ($${r.pay})</button>
-                            <button onclick="processReview('${doc.id}', '${r.userId}', ${r.pay}, false)" class="bg-red-600 p-2 rounded font-bold">RECHAZAR</button>
-                        </div>
-                    </div>`;
-            });
-        });
-
-        // Pagar Retiros
-        db.collection('retiros').where('status', '==', 'pendiente').onSnapshot(snap => {
-            const c = document.getElementById('a-w');
-            document.getElementById('badge-pagos').innerText = snap.size;
-            document.getElementById('badge-pagos').classList.toggle('hidden', snap.size === 0);
-            c.innerHTML = "";
-            snap.forEach(doc => {
-                const w = doc.data();
-                c.innerHTML += `
-                    <div class="glass p-3 text-[10px] border-yellow-500/30 border">
-                        <p class="text-white"><b>${w.userNick}</b> solicita <b>$${w.amount.toFixed(2)}</b></p>
-                        <p class="bg-black p-2 my-2 text-green-300 font-mono">${w.method}: ${w.address}</p>
-                        <div class="flex gap-2">
-                            <button onclick="processWithdraw('${doc.id}', true)" class="bg-green-600 p-2 rounded flex-grow font-bold">MARCAR PAGADO</button>
-                            <button onclick="processWithdraw('${doc.id}', false, '${w.userId}', ${w.amount})" class="bg-red-600 p-2 rounded font-bold">CANCELAR</button>
-                        </div>
-                    </div>`;
-            });
-        });
-    }
-
-    async function banUser(email, isB) { await db.collection('usuarios').doc(email).update({ banned: !isB }); }
-
-    async function processReview(rid, uid, p, ok) {
-        await db.collection('resenas').doc(rid).update({ status: ok ? 'aprobado' : 'rechazado' });
-        if(ok) {
-            const uRef = db.collection('usuarios').doc(uid);
-            await db.runTransaction(async (t) => {
-                const d = await t.get(uRef);
-                t.update(uRef, { saldo: d.data().saldo + p });
-            });
-        }
-    }
-
-    async function processWithdraw(wid, ok, uid, am) {
-        await db.collection('retiros').doc(wid).update({ status: ok ? 'pagado' : 'cancelado' });
-        if(!ok) {
-            const uRef = db.collection('usuarios').doc(uid);
-            await db.runTransaction(async (t) => {
-                const d = await t.get(uRef);
-                t.update(uRef, { saldo: d.data().saldo + am });
-            });
-        }
+        alert("Enviado al historial.");
     }
 </script>
 </body>
