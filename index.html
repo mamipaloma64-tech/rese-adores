@@ -12,18 +12,38 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Inter:wght@300;400;700&display=swap');
         :root { --neon: #bc13fe; }
-        body { background: #050505; color: #e2e8f0; font-family: 'Inter', sans-serif; min-height: 100vh; margin: 0; }
+        
+        body { 
+            background: #050505; 
+            /* Regresan las estrellas */
+            background-image: radial-gradient(2px 2px at 20px 30px, #eee, rgba(0,0,0,0)), radial-gradient(2px 2px at 40px 70px, #fff, rgba(0,0,0,0)), radial-gradient(1.5px 1.5px at 100px 150px, #ddd, rgba(0,0,0,0));
+            background-repeat: repeat; background-size: 300px 300px;
+            color: #e2e8f0; font-family: 'Inter', sans-serif; min-height: 100vh; margin: 0; 
+        }
+
         .neon-text { color: var(--neon); text-shadow: 0 0 15px rgba(188, 19, 254, 0.6); font-family: 'Orbitron'; }
         .glass { background: rgba(15, 15, 20, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(188, 19, 254, 0.2); border-radius: 12px; }
-        .input-q { background: #000; border: 1px solid #333; color: white; padding: 12px; border-radius: 8px; width: 100%; outline: none; }
+        .input-q { background: #000; border: 1px solid #333; color: white; padding: 12px; border-radius: 8px; width: 100%; outline: none; transition: 0.3s; }
+        .input-q:focus { border-color: var(--neon); box-shadow: 0 0 10px rgba(188, 19, 254, 0.3); }
         .btn-p { background: linear-gradient(135deg, #bc13fe, #6a0dad); padding: 12px; border-radius: 8px; font-weight: 900; font-family: 'Orbitron'; color: white; width: 100%; border: none; cursor: pointer; }
+        
         .sidebar { width: 260px; height: 100vh; position: fixed; left: 0; top: 0; background: rgba(0,0,0,0.9); border-right: 1px solid #1a1a1a; z-index: 100; display: flex; flex-direction: column; }
         .main { margin-left: 260px; padding: 30px; padding-bottom: 120px; }
-        @media (max-width: 768px) { .sidebar { display: none; } .main { margin-left: 0; padding-bottom: 140px; } .mobile-nav { display: grid; grid-template-columns: repeat(5, 1fr); position: fixed; bottom: 0; width: 100%; background: #000; height: 85px; border-top: 2px solid var(--neon); z-index: 1000; } }
-        .nav-item-m { display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 16px; color: #555; }
-        .nav-item-m.active { color: white; text-shadow: 0 0 10px var(--neon); }
+        
+        @media (max-width: 768px) { 
+            .sidebar { display: none; } .main { margin-left: 0; padding-bottom: 140px; }
+            .mobile-nav { 
+                display: grid; grid-template-columns: repeat(5, 1fr); 
+                position: fixed; bottom: 0; width: 100%; background: #000; 
+                height: 85px; border-top: 2px solid var(--neon); z-index: 1000; 
+            }
+            .mobile-nav.admin-active { grid-template-columns: repeat(6, 1fr); }
+            .nav-item-m { display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 16px; color: #555; }
+            .nav-item-m.active { color: white; text-shadow: 0 0 10px var(--neon); }
+        }
+        
         .view { display: none; } .view.active { display: block; }
-        .tab-btn { padding: 8px 12px; font-size: 9px; font-weight: bold; border-radius: 5px; background: #111; color: #666; transition: 0.3s; }
+        .tab-btn { padding: 8px 12px; font-size: 9px; font-weight: bold; border-radius: 5px; background: #111; color: #666; transition: 0.3s; text-transform: uppercase; }
         .tab-btn.active { background: var(--neon); color: white; }
     </style>
 </head>
@@ -32,21 +52,19 @@
 <div id="auth-gate" class="flex items-center justify-center min-h-screen p-6 relative z-10">
     <div class="glass p-8 w-full max-w-[360px] text-center shadow-2xl border-t-2 border-[#bc13fe]">
         <h1 class="neon-text text-2xl mb-6 italic font-black">REVIEWPOSITIVE</h1>
-        
         <div id="login-box" class="space-y-4">
             <input type="email" id="l-email" placeholder="Correo" class="input-q">
             <input type="password" id="l-pass" placeholder="Contraseña" class="input-q">
             <button onclick="loginEmail()" class="btn-p">ENTRAR</button>
             <p class="text-[10px] mt-4 text-gray-400">¿No tienes cuenta? <span onclick="toggleAuth(true)" class="underline cursor-pointer text-white">Regístrate</span></p>
         </div>
-
         <div id="reg-box" class="space-y-4 hidden">
             <input type="text" id="r-nick" placeholder="Apodo" class="input-q">
             <input type="email" id="r-email" placeholder="Correo" class="input-q">
             <input type="password" id="r-pass" placeholder="Contraseña" class="input-q">
-            <input type="text" id="r-ref" placeholder="Código de Referido (Opcional)" class="input-q">
+            <input type="text" id="r-ref" placeholder="Código de Referido" class="input-q">
             <button onclick="register()" class="btn-p">CREAR CUENTA</button>
-            <p class="text-[10px] mt-4 text-gray-400">¿Ya tienes cuenta? <span onclick="toggleAuth(false)" class="underline cursor-pointer text-white">Inicia Sesión</span></p>
+            <p class="text-[10px] mt-4 text-gray-400" onclick="toggleAuth(false)">Ya tengo cuenta.</p>
         </div>
     </div>
 </div>
@@ -60,6 +78,7 @@
             <div onclick="nav('v-history')" class="hover:text-white cursor-pointer">📜 HISTORIAL</div>
             <div onclick="nav('v-refs')" class="hover:text-white cursor-pointer">👥 REFERIDOS</div>
             <div onclick="nav('v-wallet')" class="hover:text-white cursor-pointer">💰 CAJERO</div>
+            <div id="adm-btn" class="hidden text-yellow-500 pt-4 border-t border-white/10" onclick="nav('v-admin')">⚡ ADMIN</div>
         </nav>
         <button onclick="logout()" class="text-red-500 text-[10px] font-bold">CERRAR SESIÓN</button>
     </aside>
@@ -70,6 +89,7 @@
         <div onclick="nav('v-history')" class="nav-item-m">📜</div>
         <div onclick="nav('v-refs')" class="nav-item-m">👥</div>
         <div onclick="nav('v-wallet')" class="nav-item-m">💰</div>
+        <div id="adm-btn-mb" class="hidden nav-item-m text-yellow-500" onclick="nav('v-admin')">⚡</div>
     </nav>
 
     <main class="main">
@@ -107,11 +127,21 @@
 
         <div id="v-wallet" class="view">
             <h2 class="font-black mb-6 italic text-xl uppercase text-white border-b border-gray-800 pb-2">CAJERO</h2>
-            <div class="glass p-6 max-w-md space-y-4">
-                <input type="number" id="w-amount" placeholder="Monto $" class="input-q">
-                <input type="text" id="w-address" placeholder="Datos de pago" class="input-q">
-                <button onclick="alert('Solicitud enviada')" class="btn-p">RETIRAR</button>
+            <div class="glass p-6 max-w-md space-y-4 border-t-2 border-green-500">
+                <p class="text-[10px] text-gray-400 font-bold uppercase">Solicitar Retiro</p>
+                <input type="number" id="w-amount" placeholder="Monto en $" class="input-q">
+                <select id="w-method" class="input-q">
+                    <option value="Binance Pay">Binance Pay (ID)</option>
+                    <option value="Pago Movil">Pago Móvil (V-Cedula-Tlf-Banco)</option>
+                </select>
+                <textarea id="w-details" placeholder="Ej: ID de Binance o Datos de Pago Móvil completo" class="input-q h-24"></textarea>
+                <button onclick="requestWithdraw()" class="btn-p">ENVIAR SOLICITUD DE COBRO</button>
             </div>
+        </div>
+
+        <div id="v-admin" class="view">
+            <h2 class="text-yellow-500 font-black mb-6 italic text-2xl uppercase">PANEL CONTROL MASTER</h2>
+            <div id="admin-resenas" class="space-y-4"></div>
         </div>
     </main>
 </div>
@@ -128,22 +158,16 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const auth = firebase.auth();
+    const MASTER_EMAIL = "nevinarg.2023@gmail.com";
     let userData = null;
 
-    // --- AUTENTICACIÓN CORREGIDA ---
-
+    // --- AUTENTICACIÓN ---
     async function loginEmail() {
         const e = document.getElementById('l-email').value.trim();
         const p = document.getElementById('l-pass').value;
-        if(!e || !p) return alert("Llena todos los campos");
-
-        try {
-            await auth.signInWithEmailAndPassword(e, p);
-        } catch (error) {
-            if (error.code === 'auth/user-not-found') alert("Esta cuenta no existe. ¡Regístrate!");
-            else if (error.code === 'auth/wrong-password') alert("Contraseña incorrecta");
-            else alert("Error al entrar: " + error.message);
-        }
+        if(!e || !p) return alert("Completa los campos");
+        try { await auth.signInWithEmailAndPassword(e, p); } 
+        catch (err) { alert("Error: " + err.message); }
     }
 
     async function register() {
@@ -151,32 +175,18 @@
         const email = document.getElementById('r-email').value.trim();
         const pass = document.getElementById('r-pass').value;
         const ref = document.getElementById('r-ref').value.trim();
-
         if(!nick || !email || !pass) return alert("Completa los datos");
 
         try {
-            // Intentar crear usuario en Auth
-            const userCredential = await auth.createUserWithEmailAndPassword(email, pass);
-            const user = userCredential.user;
-
-            // Guardar datos en Firestore
+            await auth.createUserWithEmailAndPassword(email, pass);
             const refCode = Math.random().toString(36).substring(2, 8).toUpperCase();
             await db.collection('usuarios').doc(email).set({
-                nick: nick,
-                email: email,
-                saldo: 0,
-                refCode: refCode,
-                referredBy: ref || null,
+                nick: nick, email: email, saldo: 0, 
+                refCode: refCode, referredBy: ref || null,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
-            alert("¡Cuenta creada con éxito!");
-        } catch (error) {
-            if (error.code === 'auth/email-already-in-use') alert("¡Ya tienes una cuenta con este correo! Inicia sesión.");
-            else alert("Error: " + error.message);
-        }
+        } catch (err) { alert("Este correo ya está registrado o hay un error."); }
     }
-
-    // --- LÓGICA DE LA APP (SIN BORRAR NADA) ---
 
     auth.onAuthStateChanged(user => {
         if(user) {
@@ -188,6 +198,13 @@
                     document.getElementById('u-ref-code').innerText = userData.refCode;
                     document.getElementById('auth-gate').classList.add('hidden');
                     document.getElementById('app-panel').classList.remove('hidden');
+                    
+                    if(userData.email === MASTER_EMAIL) {
+                        document.getElementById('adm-btn').classList.remove('hidden');
+                        document.getElementById('adm-btn-mb').classList.remove('hidden');
+                        document.getElementById('mb-nav').classList.add('admin-active');
+                        loadAdmin();
+                    }
                     loadTasks();
                     filterHistory('pendiente');
                     loadRefs();
@@ -199,6 +216,7 @@
         }
     });
 
+    // --- LOGICA REPETIBLE ---
     function toggleAuth(reg) {
         document.getElementById('login-box').classList.toggle('hidden', reg);
         document.getElementById('reg-box').classList.toggle('hidden', !reg);
@@ -216,8 +234,8 @@
             snap.forEach(doc => {
                 const t = doc.data();
                 cont.innerHTML += `<div class="glass p-4 border-l-4 border-purple-500">
-                    <p class="text-xs font-black uppercase mb-2">${t.name} - $${t.pay}</p>
-                    <input id="url-${doc.id}" placeholder="Link de reseña" class="input-q !p-2 text-[10px] mb-2">
+                    <p class="text-xs font-black uppercase mb-3">${t.name} - <span class="text-green-400">$${t.pay}</span></p>
+                    <input id="url-${doc.id}" placeholder="Link de tu reseña" class="input-q !p-2 text-[10px] mb-2">
                     <button onclick="sendReview('${doc.id}', '${t.name}', ${t.pay})" class="btn-p !p-2 text-[10px]">ENVIAR A REVISIÓN</button>
                 </div>`;
             });
@@ -228,10 +246,10 @@
         const url = document.getElementById(`url-${tid}`).value.trim();
         if(!url) return alert("Pega el link");
         await db.collection('resenas').add({
-            userId: userData.email, taskName: tname, pay: tpay,
+            userId: userData.email, userNick: userData.nick, taskName: tname, pay: tpay,
             url: url, status: 'pendiente', createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-        alert("Enviada al historial");
+        alert("Enviado al historial.");
     }
 
     function filterHistory(status) {
@@ -242,7 +260,9 @@
             cont.innerHTML = "";
             snap.forEach(doc => {
                 const r = doc.data();
-                cont.innerHTML += `<div class="glass p-3 text-[10px]"><b>${r.taskName}</b> - $${r.pay}</div>`;
+                cont.innerHTML += `<div class="glass p-3 text-[10px] border-l-2 ${r.status==='aprobado'?'border-green-500':'border-gray-500'}">
+                    <b>${r.taskName}</b> - $${r.pay}
+                </div>`;
             });
         });
     }
@@ -252,12 +272,46 @@
             const cont = document.getElementById('refs-list');
             cont.innerHTML = "";
             snap.forEach(doc => {
-                cont.innerHTML += `<div class="glass p-3 text-[10px] flex justify-between"><span>${doc.data().nick}</span> <span class="text-green-500">Activo</span></div>`;
+                const u = doc.data();
+                cont.innerHTML += `<div class="glass p-3 text-[10px] flex justify-between"><span>${u.nick}</span> <span class="text-green-400">Activo</span></div>`;
             });
         });
     }
 
-    function logout() { auth.signOut(); }
+    // --- ADMIN (RECUPERADO) ---
+    function loadAdmin() {
+        db.collection('resenas').where('status', '==', 'pendiente').onSnapshot(snap => {
+            const cont = document.getElementById('admin-resenas');
+            cont.innerHTML = "";
+            snap.forEach(doc => {
+                const r = doc.data();
+                cont.innerHTML += `<div class="glass p-4 space-y-2 border-l-4 border-yellow-500">
+                    <p class="text-[10px] font-black">${r.userNick} - ${r.taskName}</p>
+                    <a href="${r.url}" target="_blank" class="text-blue-400 text-[10px] underline block">VER RESEÑA</a>
+                    <div class="flex gap-2">
+                        <button onclick="approve('${doc.id}', '${r.userId}', ${r.pay})" class="bg-green-600 p-2 rounded text-[10px] font-black w-full">APROBAR</button>
+                        <button onclick="reject('${doc.id}')" class="bg-red-600 p-2 rounded text-[10px] font-black w-full">RECHAZAR</button>
+                    </div>
+                </div>`;
+            });
+        });
+    }
+
+    async function approve(rid, uid, pay) {
+        await db.collection('resenas').doc(rid).update({ status: 'aprobado' });
+        const uRef = db.collection('usuarios').doc(uid);
+        await db.runTransaction(async (t) => {
+            const uDoc = await t.get(uRef);
+            t.update(uRef, { saldo: uDoc.data().saldo + pay });
+        });
+    }
+
+    async function reject(rid) {
+        const reason = prompt("Razón del rechazo:");
+        if(reason) await db.collection('resenas').doc(rid).update({ status: 'rechazado', reason: reason });
+    }
+
+    function logout() { auth.signOut(); location.reload(); }
 </script>
 </body>
 </html>
